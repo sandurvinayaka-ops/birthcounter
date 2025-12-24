@@ -1,8 +1,8 @@
-
 import { GoogleGenAI, Type } from "@google/genai";
 
 export async function fetchPopulationInsights() {
-  const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+  // Use the required initialization format
+  const ai = new GoogleGenAI({ apiKey: process.env.API_KEY || "" });
   
   const prompt = `Provide a detailed yet concise analysis of current global population trends. 
   Focus on the regions with highest birth rates and the socio-economic implications for the next 20 years.
@@ -34,6 +34,7 @@ export async function fetchPopulationInsights() {
     return JSON.parse(text);
   } catch (error) {
     console.error("Gemini Error:", error);
+    // Fallback data if the API call fails or key is missing
     return {
       summary: "Global birth patterns are shifting towards Africa and South Asia, while many developed nations face declining birth rates.",
       keyPoints: [

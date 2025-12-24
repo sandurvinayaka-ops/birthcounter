@@ -67,14 +67,6 @@ const App: React.FC = () => {
         {/* Left Sidebar: Counter Display (30%) */}
         <aside className="w-[30%] min-w-[300px] max-w-[500px] flex flex-col">
           <BirthCounter />
-          
-          {/* Small analytical text block for sidebar completeness */}
-          <div className="mt-6 p-6 bg-slate-900/40 backdrop-blur-sm border border-slate-800/50 rounded-[2rem]">
-            <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-yellow-500/80 mb-2">Live Statistics</h3>
-            <p className="text-xs text-slate-400 leading-relaxed font-medium">
-              Monitoring global population expansion in real-time. Estimates based on 140 million annual births globally.
-            </p>
-          </div>
         </aside>
 
         {/* Right Section: World Map Visualization (70%) */}
