@@ -1,14 +1,21 @@
 import { GoogleGenAI, Type } from "@google/genai";
 
 export async function fetchPopulationInsights() {
+  // Access the environment variable injected by Vite
+  const apiKey = process.env.API_KEY;
+  
   // Use the required initialization format
-  const ai = new GoogleGenAI({ apiKey: process.env.API_KEY || "" });
+  const ai = new GoogleGenAI({ apiKey: apiKey || "" });
   
   const prompt = `Provide a detailed yet concise analysis of current global population trends. 
   Focus on the regions with highest birth rates and the socio-economic implications for the next 20 years.
   Format the response as JSON with properties: summary (string), keyPoints (array of strings), projection (string).`;
 
   try {
+    if (!apiKey) {
+      throw new Error("API Key is missing. Falling back to static data.");
+    }
+
     const response = await ai.models.generateContent({
       model: "gemini-3-flash-preview",
       contents: prompt,
@@ -33,8 +40,8 @@ export async function fetchPopulationInsights() {
     if (!text) throw new Error("Empty response from AI");
     return JSON.parse(text);
   } catch (error) {
-    console.error("Gemini Error:", error);
-    // Fallback data if the API call fails or key is missing
+    console.warn("Gemini Insights Unavailable:", error);
+    // Reliable fallback data for production stability
     return {
       summary: "Global birth patterns are shifting towards Africa and South Asia, while many developed nations face declining birth rates.",
       keyPoints: [
@@ -42,7 +49,7 @@ export async function fetchPopulationInsights() {
         "Aging populations in East Asia and Europe pose economic challenges.",
         "Urbanization continues to influence family size worldwide."
       ],
-      projection: "The world population is expected to reach 9.7 billion by 2050, driven primarily by 8 countries."
+      projection: "The world population is expected to reach 9.7 billion by 2050, driven primarily by 8 key nations."
     };
   }
 }
