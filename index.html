@@ -3,85 +3,63 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Birth Pulse - Cinematic TV Pro V96 (Widescreen)</title>
+    <title>Birth Pulse - Realistic Space V97</title>
     <script src="https://d3js.org/d3.v7.min.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         body, html {
             margin: 0; padding: 0; width: 100vw; height: 100vh;
-            overflow: hidden; background-color: #000000;
-            font-family: Arial, Helvetica, sans-serif; color: white;
+            overflow: hidden; background-color: #020617;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; color: white;
             cursor: default; touch-action: none;
         }
 
-        /* 1. OVERLAYS */
-        #sleep-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: #000000; z-index: 10000; display: none; }
+        #sleep-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: #000; z-index: 10000; display: none; }
 
-        /* 2. UI LAYOUT - Optimized for 1920x540 */
         .ui-root {
-            position: absolute; left: 4vw; top: 0; bottom: 0;
-            width: 40vw; z-index: 500; pointer-events: none;
+            position: absolute; left: 5vw; top: 0; bottom: 0;
+            width: 35vw; z-index: 500; pointer-events: none;
             display: flex; flex-direction: column; justify-content: center;
-            gap: 4vh;
+            gap: 3vh;
         }
 
-        .header-box { pointer-events: auto; }
-        .philips-title { font-size: 3.5vh; font-weight: 900; color: #0b5ed7; letter-spacing: 1px; margin-bottom: 2px; text-transform: uppercase; }
-        .main-heading { font-size: 4.5vh; color: #a855f7; font-weight: 800; white-space: nowrap; }
-        .main-heading span { display: inline-block; transition: all 0.5s ease; }
+        .philips-title { font-size: 3vh; font-weight: 900; color: #3b82f6; letter-spacing: 2px; text-transform: uppercase; opacity: 0.9; }
+        .main-heading { font-size: 5vh; color: #e9d5ff; font-weight: 800; line-height: 1.1; }
         
-        @keyframes wordPulse {
-            0%, 20%, 100% { transform: scale(1); color: #a855f7; text-shadow: 0 0 10px rgba(168, 85, 247, 0.4); }
-            10% { transform: scale(1.1); color: #fbbf24; text-shadow: 0 0 20px rgba(251, 191, 36, 0.6); }
-        }
-        @keyframes ampJump { 0%, 55%, 75%, 100% { transform: translateY(0); } 65% { transform: translateY(-10px); } }
-
-        .w1 { animation: wordPulse 3s infinite 0.0s; }
-        .w_amp { color: #a855f7 !important; margin: 0 0.5vw; animation: ampJump 3s infinite; }
-        .w2 { animation: wordPulse 3s infinite 0.6s; }
-        .w3 { animation: wordPulse 3s infinite 1.2s; }
-
         .stats-box { pointer-events: auto; width: 100%; }
-        .label { font-size: 2.2vh; color: #38bdf8; text-transform: uppercase; font-weight: 900; letter-spacing: 2px; }
-        .count { font-size: 11vh; font-weight: 900; color: #fbbf24; line-height: 1; margin: 0; }
+        .label { font-size: 2vh; color: #38bdf8; text-transform: uppercase; font-weight: 700; letter-spacing: 1.5px; opacity: 0.8; }
+        .count { font-size: 12vh; font-weight: 900; color: #fbbf24; line-height: 1; margin: 0.5vh 0; text-shadow: 0 0 30px rgba(251, 191, 36, 0.3); }
         
-        .progress-ui { width: 90%; margin-top: 5px; }
-        .bar-wrapper { width: 100%; height: 10px; background: rgba(255,255,255,0.1); border-radius: 20px; overflow: hidden; margin-top: 4px; }
-        .bar-fill { height: 100%; width: 0%; background: #fbbf24; box-shadow: 0 0 10px #fbbf24; }
-        #clock { color: #fbbf24; font-size: 2.8vh; font-weight: bold; display: block; text-align: center; margin-top: 5px; }
+        .progress-ui { width: 85%; margin-top: 10px; }
+        .bar-wrapper { width: 100%; height: 8px; background: rgba(255,255,255,0.1); border-radius: 10px; overflow: hidden; }
+        .bar-fill { height: 100%; width: 0%; background: linear-gradient(90deg, #3b82f6, #fbbf24); box-shadow: 0 0 15px rgba(251, 191, 36, 0.5); }
+        #clock { color: #94a3b8; font-size: 2.5vh; font-weight: 500; display: block; text-align: center; margin-top: 1vh; letter-spacing: 1px; }
 
-        /* 3. CANVAS */
         .stars-container { position: absolute; width: 100%; height: 100%; z-index: 1; pointer-events: none; }
         .star { position: absolute; background: white; border-radius: 50%; animation: blink var(--t) infinite ease-in-out; }
-        @keyframes blink { 0%, 100% { opacity: 0.1; transform: scale(0.8); } 50% { opacity: 0.8; } }
+        @keyframes blink { 0%, 100% { opacity: 0.2; transform: scale(1); } 50% { opacity: 0.7; transform: scale(1.2); } }
+        
         .canvas-container { position: absolute; left: 0; top: 0; width: 100vw; height: 100vh; z-index: 5; }
         #main-canvas { width: 100%; height: 100%; cursor: grab; }
-        #main-canvas:active { cursor: grabbing; }
 
-        #loading { position: absolute; width: 100%; height: 100%; background: #000000; display: flex; align-items: center; justify-content: center; z-index: 11000; color: #38bdf8; font-size: 4vh; }
+        #loading { position: absolute; width: 100%; height: 100%; background: #000; display: flex; align-items: center; justify-content: center; z-index: 11000; color: #3b82f6; font-size: 3vh; font-weight: bold; letter-spacing: 4px; }
     </style>
 </head>
 <body>
 
-    <div id="loading">CALIBRATING INTERACTION ENGINE...</div>
+    <div id="loading">INITIALIZING COSMOS...</div>
     <div id="sleep-overlay"></div>
 
     <div class="ui-root">
         <div class="header-box">
-            <div class="philips-title">PHILIPS</div>
-            <h1 class="main-heading">
-                <span class="w1">Mother</span> <span class="w_amp">&</span> <span class="w2">Child</span> <span class="w3">Care</span>
-            </h1>
+            <div class="philips-title">Philips</div>
+            <h1 class="main-heading">Mother & Child Care</h1>
         </div>
 
         <div class="stats-box">
-            <span class="label">Birth Count Today</span>
+            <span class="label">World Births Today</span>
             <div id="birthCount" class="count">0</div>
             <div class="progress-ui">
-                <div class="flex justify-between w-[100%] mb-1 px-1">
-                    <span class="text-cyan-400 font-bold text-[1.8vh]">00:00</span>
-                    <span class="text-cyan-400 font-bold text-[1.8vh]">24:00</span>
-                </div>
                 <div class="bar-wrapper"><div id="bar" class="bar-fill"></div></div>
                 <span id="clock">00:00:00</span>
             </div>
@@ -92,27 +70,26 @@
     <div class="canvas-container"><canvas id="main-canvas"></canvas></div>
 
     <script>
-        var BIRTH_RATE = 4.34, EARTH_ROT_SPD = 0.008, RESUME_DELAY = 5000, TARGET_TILT = -15;
+        var BIRTH_RATE = 4.34, EARTH_ROT_SPD = 0.008, RESUME_DELAY = 4000, TARGET_TILT = -12;
 
-        var moon = { d:300, sz:45, spd:0.0012, ang:Math.random()*7, col:"#f0f9ff" };
-        var saturn = { d:500, sz:25, spd:0.0002, ang:Math.random()*7, col: "#d8ae8d" };
-        var worldGeo = null, featureIndex = {}, flashingISO = {}, comets = [];
+        // Realistic Planet Data
+        var planets = [
+            { name: "Moon", d: 320, sz: 38, spd: 0.0008, ang: Math.random()*7, col1: "#f1f5f9", col2: "#94a3b8", hasCraters: true },
+            { name: "Saturn", d: 580, sz: 28, spd: 0.0003, ang: Math.random()*7, col1: "#fed7aa", col2: "#7c2d12", hasRings: true }
+        ];
+
+        var worldGeo = null, comets = [];
         var canvas = document.getElementById("main-canvas"), context = canvas.getContext("2d");
         var w, h, isDragging = false, lastX, lastY, rotX = 0, rotY = TARGET_TILT, lastT = Date.now(), lastIntT = Date.now();
 
         function setSizes() { w = window.innerWidth; h = window.innerHeight; canvas.width = w; canvas.height = h; }
         setSizes();
         
-        var projection = d3.geoOrthographic().scale(h/2.1).translate([w*0.74, h*0.5]).clipAngle(90);
+        var projection = d3.geoOrthographic().scale(h/2.2).translate([w*0.72, h*0.5]).clipAngle(90);
         var path = d3.geoPath(projection, context);
 
         function startDrag(x, y) { isDragging = true; lastX = x; lastY = y; lastIntT = Date.now(); }
-        function moveDrag(x, y) { 
-            if (isDragging) {
-                rotX += (x - lastX) * 0.3; rotY -= (y - lastY) * 0.3;
-                lastX = x; lastY = y; lastIntT = Date.now();
-            }
-        }
+        function moveDrag(x, y) { if (isDragging) { rotX += (x - lastX) * 0.3; rotY -= (y - lastY) * 0.3; lastX = x; lastY = y; lastIntT = Date.now(); } }
         function endDrag() { isDragging = false; lastIntT = Date.now(); }
 
         canvas.addEventListener('mousedown', function(e) { startDrag(e.clientX, e.clientY); });
@@ -122,7 +99,6 @@
         function init() {
             d3.json("https://raw.githubusercontent.com/nvkelso/natural-earth-vector/master/geojson/ne_110m_admin_0_countries.geojson").then(function(data) {
                 worldGeo = data;
-                for(var i=0; i<data.features.length; i++){ var f = data.features[i]; featureIndex[f.properties.ISO_A3 || f.properties.ADM0_A3] = f; }
                 document.getElementById('loading').style.display='none';
                 requestAnimationFrame(renderLoop); startSimulation();
             });
@@ -132,43 +108,91 @@
             var now = Date.now(), dt = now - lastT; lastT = now;
             if (!isDragging && now - lastIntT > RESUME_DELAY) {
                 rotX += EARTH_ROT_SPD * dt;
-                if (Math.abs(rotY - TARGET_TILT) > 0.1) rotY += (TARGET_TILT - rotY) * 0.02;
+                rotY += (TARGET_TILT - rotY) * 0.02;
             }
 
             projection.rotate([rotX, rotY]);
             context.clearRect(0,0,w,h);
-            var ex=w*0.74, ey=h*0.5;
+            var ex=w*0.72, ey=h*0.5;
 
-            var sAng = now * 0.00003, sx = ex + Math.cos(sAng)*(w*0.4), sy = ey + Math.sin(sAng)*(h*0.3);
-            var sGrad = context.createRadialGradient(sx,sy,0,sx,sy,40);
-            sGrad.addColorStop(0,"#ffffff"); sGrad.addColorStop(1,"transparent");
-            context.beginPath(); context.arc(sx,sy,40,0,7); context.fillStyle=sGrad; context.fill();
+            // 1. Draw The Sun (Dynamic Light Source)
+            var sAng = now * 0.00002, sx = ex + Math.cos(sAng)*(w*0.5), sy = ey + Math.sin(sAng)*(h*0.3);
+            drawSun(sx, sy);
 
-            drawPlanet(moon, ex, ey, sx, sy, dt);
-            drawPlanet(saturn, ex, ey, sx, sy, dt);
+            // 2. Draw Planets
+            planets.forEach(function(p) { drawRealisticPlanet(p, ex, ey, sx, sy, dt); });
 
+            // 3. Draw Earth
             var radius = projection.scale();
-            var oceanGrad = context.createRadialGradient(ex-radius/3, ey-radius/3, radius/20, ex, ey, radius);
-            oceanGrad.addColorStop(0, "#3b82f6"); oceanGrad.addColorStop(1, "#020617");
-            context.beginPath(); context.arc(ex, ey, radius, 0, 7); context.fillStyle = oceanGrad; context.fill();
+            
+            // Earth Atmosphere Glow
+            var atmoGrad = context.createRadialGradient(ex, ey, radius, ex, ey, radius + 20);
+            atmoGrad.addColorStop(0, "rgba(59, 130, 246, 0.4)");
+            atmoGrad.addColorStop(1, "rgba(0, 0, 0, 0)");
+            context.fillStyle = atmoGrad; context.beginPath(); context.arc(ex, ey, radius + 20, 0, 7); context.fill();
+
+            // Earth Ocean
+            var oceanGrad = context.createRadialGradient(ex - radius/3, ey - radius/3, radius/10, ex, ey, radius);
+            oceanGrad.addColorStop(0, "#1e40af"); oceanGrad.addColorStop(1, "#020617");
+            context.fillStyle = oceanGrad; context.beginPath(); context.arc(ex, ey, radius, 0, 7); context.fill();
 
             if (worldGeo) {
-                context.beginPath(); path(worldGeo); context.fillStyle = "#10b981"; context.fill();
-                context.strokeStyle = "rgba(255,255,255,0.2)"; context.stroke();
+                context.beginPath(); path(worldGeo); 
+                context.fillStyle = "#10b981"; context.fill();
+                context.strokeStyle = "rgba(255,255,255,0.15)"; context.lineWidth = 0.5; context.stroke();
             }
+
+            // Earth Shadow (Facing away from Sun)
+            var earthSunAng = Math.atan2(ey - sy, ex - sx);
+            var shadGrad = context.createRadialGradient(ex + Math.cos(earthSunAng)*radius*0.5, ey + Math.sin(earthSunAng)*radius*0.5, 0, ex, ey, radius);
+            shadGrad.addColorStop(0, "transparent"); shadGrad.addColorStop(1, "rgba(0,0,0,0.85)");
+            context.fillStyle = shadGrad; context.beginPath(); context.arc(ex, ey, radius+1, 0, 7); context.fill();
+
             updateComets();
             requestAnimationFrame(renderLoop);
         }
 
-        function drawPlanet(p,ex,ey,sx,sy,dt){
-            p.ang += p.spd*dt*0.1; var px=ex+Math.cos(p.ang)*p.d, py=ey+Math.sin(p.ang)*p.d*0.5;
-            context.beginPath(); context.arc(px,py,p.sz,0,7); context.fillStyle=p.col || "white"; context.fill();
+        function drawSun(x, y) {
+            context.save();
+            var g = context.createRadialGradient(x, y, 0, x, y, 60);
+            g.addColorStop(0, "#fff"); g.addColorStop(0.2, "#fef08a"); g.addColorStop(0.5, "#fbbf24"); g.addColorStop(1, "transparent");
+            context.shadowBlur = 40; context.shadowColor = "#fbbf24";
+            context.fillStyle = g; context.beginPath(); context.arc(x, y, 60, 0, 7); context.fill();
+            context.restore();
+        }
+
+        function drawRealisticPlanet(p, ex, ey, sx, sy, dt) {
+            p.ang += p.spd * dt * 0.1;
+            var px = ex + Math.cos(p.ang) * p.d, py = ey + Math.sin(p.ang) * p.d * 0.6;
+            
+            // Rings (Saturn)
+            if (p.hasRings) {
+                context.strokeStyle = "rgba(254, 215, 170, 0.3)";
+                context.lineWidth = 12;
+                context.beginPath();
+                context.ellipse(px, py, p.sz*2.2, p.sz*0.6, 0.2, 0, 7);
+                context.stroke();
+            }
+
+            // Body
+            var bodyGrad = context.createRadialGradient(px - p.sz/3, py - p.sz/3, 0, px, py, p.sz);
+            bodyGrad.addColorStop(0, p.col1); bodyGrad.addColorStop(1, p.col2);
+            context.fillStyle = bodyGrad; context.beginPath(); context.arc(px, py, p.sz, 0, 7); context.fill();
+
+            // Shadow facing away from sun
+            var ang = Math.atan2(py - sy, px - sx);
+            var shad = context.createRadialGradient(px + Math.cos(ang)*p.sz*0.6, py + Math.sin(ang)*p.sz*0.6, 0, px, py, p.sz);
+            shad.addColorStop(0, "transparent"); shad.addColorStop(1, "rgba(0,0,0,0.9)");
+            context.fillStyle = shad; context.beginPath(); context.arc(px, py, p.sz+0.5, 0, 7); context.fill();
         }
 
         function updateComets() {
-            if (Math.random() > 0.99) comets.push({ x:Math.random()*w, y:-50, vx:-10, vy:8, life:1 });
+            if (Math.random() > 0.992) comets.push({ x:Math.random()*w, y:-50, vx:-8, vy:6, life:1 });
             for (var i=0; i<comets.length; i++) {
-                var c = comets[i]; context.strokeStyle="white"; context.beginPath(); context.moveTo(c.x,c.y); context.lineTo(c.x+20,c.y-20); context.stroke();
+                var c = comets[i];
+                var g = context.createLinearGradient(c.x, c.y, c.x-c.vx*10, c.y-c.vy*10);
+                g.addColorStop(0, "white"); g.addColorStop(1, "transparent");
+                context.strokeStyle = g; context.lineWidth = 2; context.beginPath(); context.moveTo(c.x,c.y); context.lineTo(c.x-c.vx*5, c.y-c.vy*5); context.stroke();
                 c.x+=c.vx; c.y+=c.vy; c.life-=0.01; if(c.life<=0){ comets.splice(i,1); i--; }
             }
         }
@@ -177,18 +201,18 @@
             setInterval(function() {
                 var now = new Date(), start = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
                 var elapsed = (Date.now() - start) / 1000;
-                document.getElementById('birthCount').innerText = Math.floor(elapsed * BIRTH_RATE).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+                document.getElementById('birthCount').innerText = Math.floor(elapsed * BIRTH_RATE).toLocaleString('de-DE');
                 document.getElementById('clock').innerText = now.toLocaleTimeString('en-GB');
                 document.getElementById('bar').style.width = (elapsed / 86400 * 100) + "%";
-            }, 500);
+            }, 1000);
         }
 
         var field = document.getElementById('starfield');
-        for (var i = 0; i < 50; i++) {
+        for (var i = 0; i < 80; i++) {
             var s = document.createElement('div'); s.className = 'star';
-            s.style.width = s.style.height = (1 + Math.random()) + 'px';
+            s.style.width = s.style.height = (Math.random()*2.5) + 'px';
             s.style.left = Math.random()*100 + '%'; s.style.top = Math.random()*100 + '%';
-            s.style.setProperty('--t', (2 + Math.random()*2) + 's');
+            s.style.setProperty('--t', (1.5 + Math.random()*3) + 's');
             field.appendChild(s);
         }
         window.onresize = setSizes; init();
