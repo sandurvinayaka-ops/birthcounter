@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Birth Pulse - Philips Gold & Purple</title>
+    <title>Birth Pulse - Philips Blue & Gold Edition</title>
     <script src="https://d3js.org/d3.v7.min.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
@@ -38,12 +38,12 @@
         .canvas-container { position: absolute; left: 0; top: 0; width: 100vw; height: 100vh; z-index: 5; }
         #main-canvas { width: 100%; height: 100%; cursor: grab; }
 
-        #loading { position: absolute; width: 100%; height: 100%; background: #000; display: flex; align-items: center; justify-content: center; z-index: 11000; color: #fbbf24; font-size: 3.5vh; font-weight: 900; }
+        #loading { position: absolute; width: 100%; height: 100%; background: #000; display: flex; align-items: center; justify-content: center; z-index: 11000; color: #3b82f6; font-size: 3.5vh; font-weight: 900; }
     </style>
 </head>
 <body>
 
-    <div id="loading">IGNITING SOLAR CORE...</div>
+    <div id="loading">GENERATING OCEANIC BIOMES...</div>
 
     <div class="ui-root">
         <div class="header-box">
@@ -76,8 +76,7 @@
         function setSizes() { w = window.innerWidth; h = window.innerHeight; canvas.width = w; canvas.height = h; }
         setSizes();
         
-        // Increased scale for better visibility (h/1.85)
-        var projection = d3.geoOrthographic().scale(h/1.85).translate([w*0.73, h*0.5]).clipAngle(90);
+        var projection = d3.geoOrthographic().scale(h/1.9).translate([w*0.73, h*0.5]).clipAngle(90);
         var path = d3.geoPath(projection, context);
 
         canvas.addEventListener('mousedown', function(e) { isDragging = true; lastX = e.clientX; lastY = e.clientY; lastIntT = Date.now(); });
@@ -106,58 +105,59 @@
             context.clearRect(0,0,w,h);
             var ex=w*0.73, ey=h*0.5, r=projection.scale();
 
-            // 1. GOLDEN SUN LIGHT SOURCE
+            // 1. GOLDEN SUN
             var sTime = now * 0.0001, sx = ex + Math.cos(sTime)*(w*0.42), sy = ey + Math.sin(sTime)*(h*0.32);
             context.save();
-            var sunG = context.createRadialGradient(sx, sy, 0, sx, sy, 120);
+            var sunG = context.createRadialGradient(sx, sy, 0, sx, sy, 110);
             sunG.addColorStop(0, "#ffffff");
-            sunG.addColorStop(0.2, "#fbbf24"); // Golden Core
-            sunG.addColorStop(0.5, "rgba(245, 158, 11, 0.4)");
+            sunG.addColorStop(0.3, "#fbbf24");
             sunG.addColorStop(1, "transparent");
             context.fillStyle = sunG;
-            context.shadowBlur = 60; context.shadowColor = "#fbbf24";
-            context.beginPath(); context.arc(sx, sy, 110, 0, 7); context.fill();
+            context.shadowBlur = 40; context.shadowColor = "#fbbf24";
+            context.beginPath(); context.arc(sx, sy, 100, 0, 7); context.fill();
             context.restore();
 
-            // 2. ATMOSPHERE BORDER GLOW
-            var atmoG = context.createRadialGradient(ex, ey, r, ex, ey, r + 70);
-            atmoG.addColorStop(0, "rgba(168, 85, 247, 0.3)");
-            atmoG.addColorStop(1, "transparent");
-            context.fillStyle = atmoG; context.beginPath(); context.arc(ex, ey, r + 70, 0, 7); context.fill();
-
-            // 3. OCEAN (Rich Deep Navy)
-            var oG = context.createRadialGradient(ex-r/4, ey-r/4, r/10, ex, ey, r);
-            oG.addColorStop(0, "#0f172a"); oG.addColorStop(1, "#020617");
+            // 2. OCEAN (Vibrant Blue Gradient)
+            var oG = context.createRadialGradient(ex-r/4, ey-r/4, r/5, ex, ey, r);
+            oG.addColorStop(0, "#2563eb"); // Electric Blue core
+            oG.addColorStop(0.6, "#1e3a8a"); // Deep Blue
+            oG.addColorStop(1, "#0f172a"); // Midnight edge
             context.fillStyle = oG; context.beginPath(); context.arc(ex, ey, r, 0, 7); context.fill();
 
-            // 4. COUNTRIES (High Visibility Landmass)
+            // 3. COUNTRIES (Bright Pearl Contrast)
             if (worldGeo) {
                 context.beginPath(); path(worldGeo); 
-                context.fillStyle = "#475569"; // Slate Grey/Teal for contrast
+                context.fillStyle = "#cbd5e1"; // Pearl Silver
                 context.fill();
-                context.strokeStyle = "rgba(255, 255, 255, 0.5)"; // Bright Borders
-                context.lineWidth = 1.2; context.stroke();
+                context.strokeStyle = "rgba(255, 255, 255, 0.8)"; 
+                context.lineWidth = 1; context.stroke();
 
-                // BIRTH PULSE (Neon Magenta)
+                // BIRTH PULSE (Intense Neon Magenta)
                 var currentNow = Date.now();
                 flashingCountries.forEach((f, idx) => {
                     var age = currentNow - f.time;
-                    if (age < 1800) {
+                    if (age < 1500) {
                         context.save();
-                        var alpha = 1 - (age/1800);
+                        var alpha = 1 - (age/1500);
                         context.globalAlpha = alpha;
-                        context.fillStyle = "#e879f9"; // Bright Magenta
-                        context.shadowBlur = 30 * alpha; context.shadowColor = "#ffffff";
+                        context.fillStyle = "#ff00ff"; // Pure Neon Magenta
+                        context.shadowBlur = 40 * alpha; context.shadowColor = "#ffffff";
                         context.beginPath(); path(f.feature); context.fill();
                         context.restore();
                     } else { flashingCountries.splice(idx, 1); }
                 });
             }
 
-            // 5. DYNAMIC SHADOW
+            // 4. ATMOSPHERE / GLOW
+            var atmoG = context.createRadialGradient(ex, ey, r, ex, ey, r + 50);
+            atmoG.addColorStop(0, "rgba(59, 130, 246, 0.4)");
+            atmoG.addColorStop(1, "transparent");
+            context.fillStyle = atmoG; context.beginPath(); context.arc(ex, ey, r + 50, 0, 7); context.fill();
+
+            // 5. SHADOW
             var eSA = Math.atan2(ey-sy, ex-sx);
             var eSh = context.createRadialGradient(ex + Math.cos(eSA)*r*0.6, ey + Math.sin(eSA)*r*0.6, 0, ex, ey, r);
-            eSh.addColorStop(0, "transparent"); eSh.addColorStop(1, "rgba(0,0,0,0.75)");
+            eSh.addColorStop(0, "transparent"); eSh.addColorStop(1, "rgba(0,0,0,0.65)");
             context.fillStyle = eSh; context.beginPath(); context.arc(ex, ey, r+1, 0, 7); context.fill();
 
             requestAnimationFrame(renderLoop);
