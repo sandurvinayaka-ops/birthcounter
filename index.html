@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Birth Pulse - Philips Blue & Gold Edition</title>
+    <title>Birth Pulse - Cinematic Space V100</title>
     <script src="https://d3js.org/d3.v7.min.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
@@ -14,36 +14,40 @@
             cursor: default; touch-action: none;
         }
 
+        /* 80% SCALED UI ROOT */
         .ui-root {
             position: absolute; left: 5vw; top: 0; bottom: 0;
-            width: 42vw; z-index: 500; pointer-events: none;
+            width: 38vw; z-index: 500; pointer-events: none;
             display: flex; flex-direction: column; justify-content: center;
-            gap: 2vh;
+            gap: 1.5vh;
+            transform: scale(0.8); /* UI Reduction to 80% */
+            transform-origin: left center;
         }
 
         .philips-title { font-size: 3.2vh; font-weight: 900; color: #3b82f6; letter-spacing: 3px; text-transform: uppercase; }
-        .main-heading { font-size: 5vh; color: #a855f7; font-weight: 800; line-height: 1.1; text-shadow: 0 0 20px rgba(168, 85, 247, 0.3); }
+        .main-heading { font-size: 4.8vh; color: #a855f7; font-weight: 800; line-height: 1.1; }
         
         .stats-box { pointer-events: auto; width: 100%; }
-        .label { font-size: 2.2vh; color: #94a3b8; text-transform: uppercase; font-weight: 700; letter-spacing: 2px; }
-        .count { font-size: 13.5vh; font-weight: 900; color: #fbbf24; line-height: 1; margin: 0.5vh 0; text-shadow: 0 0 30px rgba(251, 191, 36, 0.4); }
+        .label { font-size: 2vh; color: #94a3b8; text-transform: uppercase; font-weight: 700; letter-spacing: 2px; }
+        .count { font-size: 13vh; font-weight: 900; color: #fbbf24; line-height: 1; margin: 0.5vh 0; text-shadow: 0 0 30px rgba(251, 191, 36, 0.4); }
         
-        .progress-container { width: 92%; margin-top: 10px; }
+        .progress-container { width: 95%; margin-top: 10px; }
         .bar-wrapper { width: 100%; height: 14px; background: rgba(255,255,255,0.05); border-radius: 10px; overflow: hidden; border: 1px solid rgba(168, 85, 247, 0.4); }
         .bar-fill { height: 100%; width: 0%; background: linear-gradient(90deg, #fbbf24, #f59e0b); box-shadow: 0 0 20px rgba(251, 191, 36, 0.6); }
         .time-labels { display: flex; justify-content: space-between; margin-top: 8px; font-weight: 800; font-size: 2.2vh; color: #a855f7; }
         
-        #clock { color: #fbbf24; font-size: 3.2vh; font-weight: 800; display: block; text-align: center; margin-top: 1vh; letter-spacing: 2px; }
+        #clock { color: #fbbf24; font-size: 3.5vh; font-weight: 800; display: block; text-align: center; margin-top: 1.5vh; letter-spacing: 2px; }
+
+        /* STARFIELD */
+        .stars-container { position: absolute; width: 100%; height: 100%; z-index: 1; pointer-events: none; }
+        .star { position: absolute; background: white; border-radius: 50%; animation: blink var(--t) infinite ease-in-out; }
+        @keyframes blink { 0%, 100% { opacity: 0.1; transform: scale(0.8); } 50% { opacity: 1; transform: scale(1.2); box-shadow: 0 0 8px #fff; } }
 
         .canvas-container { position: absolute; left: 0; top: 0; width: 100vw; height: 100vh; z-index: 5; }
         #main-canvas { width: 100%; height: 100%; cursor: grab; }
-
-        #loading { position: absolute; width: 100%; height: 100%; background: #000; display: flex; align-items: center; justify-content: center; z-index: 11000; color: #3b82f6; font-size: 3.5vh; font-weight: 900; }
     </style>
 </head>
 <body>
-
-    <div id="loading">GENERATING OCEANIC BIOMES...</div>
 
     <div class="ui-root">
         <div class="header-box">
@@ -65,11 +69,12 @@
         </div>
     </div>
 
+    <div class="stars-container" id="starfield"></div>
     <div class="canvas-container"><canvas id="main-canvas"></canvas></div>
 
     <script>
         var BIRTH_RATE = 4.34, EARTH_ROT_SPD = 0.018, RESUME_DELAY = 2500, TARGET_TILT = -18;
-        var worldGeo = null, flashingCountries = [];
+        var worldGeo = null, flashingCountries = [], comets = [];
         var canvas = document.getElementById("main-canvas"), context = canvas.getContext("2d");
         var w, h, rotX = 0, rotY = TARGET_TILT, lastT = Date.now(), lastIntT = Date.now(), isDragging = false;
 
@@ -79,16 +84,16 @@
         var projection = d3.geoOrthographic().scale(h/1.9).translate([w*0.73, h*0.5]).clipAngle(90);
         var path = d3.geoPath(projection, context);
 
-        canvas.addEventListener('mousedown', function(e) { isDragging = true; lastX = e.clientX; lastY = e.clientY; lastIntT = Date.now(); });
-        window.addEventListener('mousemove', function(e) { 
+        // UI Interactions
+        canvas.addEventListener('mousedown', (e) => { isDragging = true; lastX = e.clientX; lastY = e.clientY; lastIntT = Date.now(); });
+        window.addEventListener('mousemove', (e) => { 
             if (isDragging) { rotX += (e.clientX - lastX) * 0.25; rotY -= (e.clientY - lastY) * 0.25; lastX = e.clientX; lastY = e.clientY; lastIntT = Date.now(); }
         });
-        window.addEventListener('mouseup', function() { isDragging = false; });
+        window.addEventListener('mouseup', () => isDragging = false);
 
         function init() {
             d3.json("https://raw.githubusercontent.com/nvkelso/natural-earth-vector/master/geojson/ne_110m_admin_0_countries.geojson").then(function(data) {
                 worldGeo = data;
-                document.getElementById('loading').style.display='none';
                 requestAnimationFrame(renderLoop);
                 startSimulation();
             });
@@ -105,54 +110,41 @@
             context.clearRect(0,0,w,h);
             var ex=w*0.73, ey=h*0.5, r=projection.scale();
 
-            // 1. GOLDEN SUN
+            // 1. ANIMATE COMETS
+            updateComets(context, dt);
+
+            // 2. GOLDEN SUN
             var sTime = now * 0.0001, sx = ex + Math.cos(sTime)*(w*0.42), sy = ey + Math.sin(sTime)*(h*0.32);
-            context.save();
             var sunG = context.createRadialGradient(sx, sy, 0, sx, sy, 110);
             sunG.addColorStop(0, "#ffffff");
             sunG.addColorStop(0.3, "#fbbf24");
             sunG.addColorStop(1, "transparent");
-            context.fillStyle = sunG;
-            context.shadowBlur = 40; context.shadowColor = "#fbbf24";
-            context.beginPath(); context.arc(sx, sy, 100, 0, 7); context.fill();
-            context.restore();
+            context.fillStyle = sunG; context.beginPath(); context.arc(sx, sy, 100, 0, 7); context.fill();
 
-            // 2. OCEAN (Vibrant Blue Gradient)
+            // 3. OCEAN
             var oG = context.createRadialGradient(ex-r/4, ey-r/4, r/5, ex, ey, r);
-            oG.addColorStop(0, "#2563eb"); // Electric Blue core
-            oG.addColorStop(0.6, "#1e3a8a"); // Deep Blue
-            oG.addColorStop(1, "#0f172a"); // Midnight edge
+            oG.addColorStop(0, "#2563eb"); oG.addColorStop(0.6, "#1e3a8a"); oG.addColorStop(1, "#0f172a");
             context.fillStyle = oG; context.beginPath(); context.arc(ex, ey, r, 0, 7); context.fill();
 
-            // 3. COUNTRIES (Bright Pearl Contrast)
+            // 4. COUNTRIES
             if (worldGeo) {
                 context.beginPath(); path(worldGeo); 
-                context.fillStyle = "#cbd5e1"; // Pearl Silver
-                context.fill();
-                context.strokeStyle = "rgba(255, 255, 255, 0.8)"; 
-                context.lineWidth = 1; context.stroke();
+                context.fillStyle = "#cbd5e1"; context.fill();
+                context.strokeStyle = "rgba(255, 255, 255, 0.8)"; context.lineWidth = 1; context.stroke();
 
-                // BIRTH PULSE (Intense Neon Magenta)
+                // BIRTH FLASHES
                 var currentNow = Date.now();
                 flashingCountries.forEach((f, idx) => {
                     var age = currentNow - f.time;
                     if (age < 1500) {
                         context.save();
-                        var alpha = 1 - (age/1500);
-                        context.globalAlpha = alpha;
-                        context.fillStyle = "#ff00ff"; // Pure Neon Magenta
-                        context.shadowBlur = 40 * alpha; context.shadowColor = "#ffffff";
+                        context.globalAlpha = 1 - (age/1500);
+                        context.fillStyle = "#ff00ff"; context.shadowBlur = 40; context.shadowColor = "#ffffff";
                         context.beginPath(); path(f.feature); context.fill();
                         context.restore();
                     } else { flashingCountries.splice(idx, 1); }
                 });
             }
-
-            // 4. ATMOSPHERE / GLOW
-            var atmoG = context.createRadialGradient(ex, ey, r, ex, ey, r + 50);
-            atmoG.addColorStop(0, "rgba(59, 130, 246, 0.4)");
-            atmoG.addColorStop(1, "transparent");
-            context.fillStyle = atmoG; context.beginPath(); context.arc(ex, ey, r + 50, 0, 7); context.fill();
 
             // 5. SHADOW
             var eSA = Math.atan2(ey-sy, ex-sx);
@@ -163,10 +155,31 @@
             requestAnimationFrame(renderLoop);
         }
 
+        function updateComets(ctx, dt) {
+            if (Math.random() < 0.015) {
+                comets.push({
+                    x: Math.random() * w, y: -50,
+                    v: 4 + Math.random() * 8,
+                    angle: Math.PI / 4 + (Math.random() * 0.2),
+                    len: 40 + Math.random() * 60,
+                    life: 1.0
+                });
+            }
+            comets.forEach((c, i) => {
+                c.x -= c.v * Math.cos(c.angle); c.y += c.v * Math.sin(c.angle);
+                c.life -= 0.005;
+                var grad = ctx.createLinearGradient(c.x, c.y, c.x + c.len, c.y - c.len);
+                grad.addColorStop(0, `rgba(255, 255, 255, ${c.life})`);
+                grad.addColorStop(1, 'transparent');
+                ctx.strokeStyle = grad; ctx.lineWidth = 2; ctx.beginPath();
+                ctx.moveTo(c.x, c.y); ctx.lineTo(c.x + c.len, c.y - c.len); ctx.stroke();
+                if (c.life <= 0 || c.x < -100 || c.y > h + 100) comets.splice(i, 1);
+            });
+        }
+
         function startSimulation() {
             setInterval(function() {
-                var now = new Date();
-                var start = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
+                var now = new Date(), start = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
                 var elapsed = (Date.now() - start) / 1000;
                 document.getElementById('birthCount').innerText = Math.floor(elapsed * BIRTH_RATE).toLocaleString('de-DE');
                 document.getElementById('clock').innerText = now.toLocaleTimeString('en-GB');
@@ -177,6 +190,17 @@
                     flashingCountries.push({ feature: rf, time: Date.now() });
                 }
             }, 1000 / (BIRTH_RATE / 1.5));
+        }
+
+        // CREATE BRIGHT BLINKING STARS
+        var field = document.getElementById('starfield');
+        for (var i = 0; i < 150; i++) {
+            var s = document.createElement('div'); s.className = 'star';
+            var size = Math.random() * 3;
+            s.style.width = s.style.height = size + 'px';
+            s.style.left = Math.random() * 100 + '%'; s.style.top = Math.random() * 100 + '%';
+            s.style.setProperty('--t', (1 + Math.random() * 4) + 's');
+            field.appendChild(s);
         }
 
         window.onresize = setSizes; init();
