@@ -1,1 +1,0 @@
-// Logic centralized in index.tsx for high-performance deployment
