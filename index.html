@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Birth Pulse - Cinematic Space V100</title>
+    <title>Birth Pulse - Philips Top-Left Layout</title>
     <script src="https://d3js.org/d3.v7.min.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
@@ -14,21 +14,28 @@
             cursor: default; touch-action: none;
         }
 
-        /* 80% SCALED UI ROOT */
-        .ui-root {
-            position: absolute; left: 5vw; top: 0; bottom: 0;
+        /* BRANDING MOVED TO TOP LEFT */
+        .branding-header {
+            position: absolute; top: 4vh; left: 4vw;
+            z-index: 1000; pointer-events: none;
+            display: flex; flex-direction: column; gap: 0.5vh;
+        }
+
+        .philips-title { font-size: 3vh; font-weight: 900; color: #3b82f6; letter-spacing: 3px; text-transform: uppercase; }
+        .main-heading { font-size: 4.2vh; color: #a855f7; font-weight: 800; line-height: 1.1; text-shadow: 0 0 20px rgba(168, 85, 247, 0.3); }
+
+        /* COUNTER REMAINS IN CENTER-LEFT AREA, SCALED 80% */
+        .ui-counter-root {
+            position: absolute; left: 4vw; top: 45%; 
             width: 38vw; z-index: 500; pointer-events: none;
             display: flex; flex-direction: column; justify-content: center;
             gap: 1.5vh;
-            transform: scale(0.8); /* UI Reduction to 80% */
+            transform: scale(0.8);
             transform-origin: left center;
         }
-
-        .philips-title { font-size: 3.2vh; font-weight: 900; color: #3b82f6; letter-spacing: 3px; text-transform: uppercase; }
-        .main-heading { font-size: 4.8vh; color: #a855f7; font-weight: 800; line-height: 1.1; }
         
         .stats-box { pointer-events: auto; width: 100%; }
-        .label { font-size: 2vh; color: #94a3b8; text-transform: uppercase; font-weight: 700; letter-spacing: 2px; }
+        .label { font-size: 2.2vh; color: #94a3b8; text-transform: uppercase; font-weight: 700; letter-spacing: 2px; }
         .count { font-size: 13vh; font-weight: 900; color: #fbbf24; line-height: 1; margin: 0.5vh 0; text-shadow: 0 0 30px rgba(251, 191, 36, 0.4); }
         
         .progress-container { width: 95%; margin-top: 10px; }
@@ -38,7 +45,7 @@
         
         #clock { color: #fbbf24; font-size: 3.5vh; font-weight: 800; display: block; text-align: center; margin-top: 1.5vh; letter-spacing: 2px; }
 
-        /* STARFIELD */
+        /* STARFIELD & CANVAS */
         .stars-container { position: absolute; width: 100%; height: 100%; z-index: 1; pointer-events: none; }
         .star { position: absolute; background: white; border-radius: 50%; animation: blink var(--t) infinite ease-in-out; }
         @keyframes blink { 0%, 100% { opacity: 0.1; transform: scale(0.8); } 50% { opacity: 1; transform: scale(1.2); box-shadow: 0 0 8px #fff; } }
@@ -49,12 +56,12 @@
 </head>
 <body>
 
-    <div class="ui-root">
-        <div class="header-box">
-            <div class="philips-title">Philips</div>
-            <h1 class="main-heading">Mother & Child Care<br>Womens Health</h1>
-        </div>
+    <div class="branding-header">
+        <div class="philips-title">Philips</div>
+        <h1 class="main-heading">Mother & Child Care<br>Womens Health</h1>
+    </div>
 
+    <div class="ui-counter-root">
         <div class="stats-box">
             <span class="label">Live Global Births Today</span>
             <div id="birthCount" class="count">0</div>
@@ -84,7 +91,6 @@
         var projection = d3.geoOrthographic().scale(h/1.9).translate([w*0.73, h*0.5]).clipAngle(90);
         var path = d3.geoPath(projection, context);
 
-        // UI Interactions
         canvas.addEventListener('mousedown', (e) => { isDragging = true; lastX = e.clientX; lastY = e.clientY; lastIntT = Date.now(); });
         window.addEventListener('mousemove', (e) => { 
             if (isDragging) { rotX += (e.clientX - lastX) * 0.25; rotY -= (e.clientY - lastY) * 0.25; lastX = e.clientX; lastY = e.clientY; lastIntT = Date.now(); }
@@ -110,10 +116,9 @@
             context.clearRect(0,0,w,h);
             var ex=w*0.73, ey=h*0.5, r=projection.scale();
 
-            // 1. ANIMATE COMETS
             updateComets(context, dt);
 
-            // 2. GOLDEN SUN
+            // GOLDEN SUN
             var sTime = now * 0.0001, sx = ex + Math.cos(sTime)*(w*0.42), sy = ey + Math.sin(sTime)*(h*0.32);
             var sunG = context.createRadialGradient(sx, sy, 0, sx, sy, 110);
             sunG.addColorStop(0, "#ffffff");
@@ -121,18 +126,17 @@
             sunG.addColorStop(1, "transparent");
             context.fillStyle = sunG; context.beginPath(); context.arc(sx, sy, 100, 0, 7); context.fill();
 
-            // 3. OCEAN
+            // OCEAN
             var oG = context.createRadialGradient(ex-r/4, ey-r/4, r/5, ex, ey, r);
             oG.addColorStop(0, "#2563eb"); oG.addColorStop(0.6, "#1e3a8a"); oG.addColorStop(1, "#0f172a");
             context.fillStyle = oG; context.beginPath(); context.arc(ex, ey, r, 0, 7); context.fill();
 
-            // 4. COUNTRIES
+            // COUNTRIES
             if (worldGeo) {
                 context.beginPath(); path(worldGeo); 
                 context.fillStyle = "#cbd5e1"; context.fill();
                 context.strokeStyle = "rgba(255, 255, 255, 0.8)"; context.lineWidth = 1; context.stroke();
 
-                // BIRTH FLASHES
                 var currentNow = Date.now();
                 flashingCountries.forEach((f, idx) => {
                     var age = currentNow - f.time;
@@ -146,7 +150,7 @@
                 });
             }
 
-            // 5. SHADOW
+            // SHADOW
             var eSA = Math.atan2(ey-sy, ex-sx);
             var eSh = context.createRadialGradient(ex + Math.cos(eSA)*r*0.6, ey + Math.sin(eSA)*r*0.6, 0, ex, ey, r);
             eSh.addColorStop(0, "transparent"); eSh.addColorStop(1, "rgba(0,0,0,0.65)");
@@ -157,13 +161,7 @@
 
         function updateComets(ctx, dt) {
             if (Math.random() < 0.015) {
-                comets.push({
-                    x: Math.random() * w, y: -50,
-                    v: 4 + Math.random() * 8,
-                    angle: Math.PI / 4 + (Math.random() * 0.2),
-                    len: 40 + Math.random() * 60,
-                    life: 1.0
-                });
+                comets.push({ x: Math.random() * w, y: -50, v: 4 + Math.random() * 8, angle: Math.PI / 4 + (Math.random() * 0.2), len: 40 + Math.random() * 60, life: 1.0 });
             }
             comets.forEach((c, i) => {
                 c.x -= c.v * Math.cos(c.angle); c.y += c.v * Math.sin(c.angle);
@@ -173,7 +171,7 @@
                 grad.addColorStop(1, 'transparent');
                 ctx.strokeStyle = grad; ctx.lineWidth = 2; ctx.beginPath();
                 ctx.moveTo(c.x, c.y); ctx.lineTo(c.x + c.len, c.y - c.len); ctx.stroke();
-                if (c.life <= 0 || c.x < -100 || c.y > h + 100) comets.splice(i, 1);
+                if (c.life <= 0) comets.splice(i, 1);
             });
         }
 
@@ -192,11 +190,10 @@
             }, 1000 / (BIRTH_RATE / 1.5));
         }
 
-        // CREATE BRIGHT BLINKING STARS
         var field = document.getElementById('starfield');
         for (var i = 0; i < 150; i++) {
             var s = document.createElement('div'); s.className = 'star';
-            var size = Math.random() * 3;
+            var size = Math.random() * 2.5;
             s.style.width = s.style.height = size + 'px';
             s.style.left = Math.random() * 100 + '%'; s.style.top = Math.random() * 100 + '%';
             s.style.setProperty('--t', (1 + Math.random() * 4) + 's');
