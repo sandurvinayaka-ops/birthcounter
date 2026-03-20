@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Birth Pulse - Cinematic TV Pro V96</title>
+    <title>Birth Pulse - Cinematic TV Pro V96 (Widescreen)</title>
     <script src="https://d3js.org/d3.v7.min.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
@@ -14,62 +14,64 @@
             cursor: default; touch-action: none;
         }
 
-        /* 1. SLEEP & QUIZ OVERLAYS */
+        /* 1. OVERLAYS */
         #sleep-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: #000000; z-index: 10000; display: none; }
         #quiz-overlay {
             position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
             background: rgba(0,0,0,0.95); z-index: 9999; display: none;
             align-items: center; justify-content: center; pointer-events: auto;
         }
-        .quiz-card { background: rgba(15, 23, 42, 0.98); border: 2px solid #a855f7; padding: 40px; border-radius: 20px; width: 65vw; text-align: center; }
-        .option-btn { display: block; width: 100%; padding: 12px; margin: 10px 0; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.2); border-radius: 10px; font-size: 1.4vw; font-weight: bold; cursor: pointer; }
+        .quiz-card { background: rgba(15, 23, 42, 0.98); border: 2px solid #a855f7; padding: 20px; border-radius: 20px; width: 50vw; text-align: center; }
+        .option-btn { display: block; width: 100%; padding: 8px; margin: 5px 0; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.2); border-radius: 10px; font-size: 3vh; font-weight: bold; cursor: pointer; }
         .option-btn:hover { background: #0b5ed7; border-color: white; }
 
-        /* 2. KNOWLEDGE BUTTON - HIGHEST Z-INDEX */
+        /* 2. KNOWLEDGE BUTTON - Adjusted for 540px height */
         .knowledge-btn {
-            position: fixed; bottom: 5vh; right: 5vw; z-index: 9000;
-            padding: 15px 30px; background: rgba(109, 40, 217, 0.6);
+            position: fixed; bottom: 4vh; right: 4vw; z-index: 9000;
+            padding: 10px 20px; background: rgba(109, 40, 217, 0.6);
             border: 2px solid #fbbf24; border-radius: 50px; color: white;
-            font-weight: 800; font-size: 1.2vw; text-transform: uppercase;
-            letter-spacing: 2px; cursor: pointer; pointer-events: auto;
+            font-weight: 800; font-size: 2.2vh; text-transform: uppercase;
+            letter-spacing: 1px; cursor: pointer; pointer-events: auto;
             animation: btn-pulse 2.5s infinite;
         }
-        @keyframes btn-pulse { 0%, 100% { box-shadow: 0 0 15px rgba(168, 85, 247, 0.4); } 50% { box-shadow: 0 0 30px rgba(251, 191, 36, 0.5); } }
+        @keyframes btn-pulse { 0%, 100% { box-shadow: 0 0 10px rgba(168, 85, 247, 0.4); } 50% { box-shadow: 0 0 20px rgba(251, 191, 36, 0.5); } }
 
-        /* 3. UI LAYOUT */
+        /* 3. UI LAYOUT - Optimized for 1920x540 */
         .ui-root {
             position: absolute; left: 4vw; top: 0; bottom: 0;
-            width: 45vw; z-index: 500; pointer-events: none;
-            display: flex; flex-direction: column; justify-content: space-between;
-            padding: 5vh 0 6vh 0;
+            width: 40vw; z-index: 500; pointer-events: none;
+            display: flex; flex-direction: column; justify-content: center;
+            gap: 4vh;
         }
 
         .header-box { pointer-events: auto; }
-        .philips-title { font-size: 2.8vw; font-weight: 900; color: #0b5ed7; letter-spacing: -0.05vw; margin-bottom: 10px; text-transform: uppercase; }
-        .main-heading { font-size: 3.1vw; color: #a855f7; font-weight: 800; white-space: nowrap; }
+        .philips-title { font-size: 3.5vh; font-weight: 900; color: #0b5ed7; letter-spacing: 1px; margin-bottom: 2px; text-transform: uppercase; }
+        .main-heading { font-size: 4.5vh; color: #a855f7; font-weight: 800; white-space: nowrap; }
         .main-heading span { display: inline-block; transition: all 0.5s ease; }
         
         @keyframes wordPulse {
-            0%, 20%, 100% { transform: scale(1); color: #a855f7; text-shadow: 0 0 20px rgba(168, 85, 247, 0.4); }
-            10% { transform: scale(1.15); color: #fbbf24; text-shadow: 0 0 30px rgba(251, 191, 36, 0.6); }
+            0%, 20%, 100% { transform: scale(1); color: #a855f7; text-shadow: 0 0 10px rgba(168, 85, 247, 0.4); }
+            10% { transform: scale(1.1); color: #fbbf24; text-shadow: 0 0 20px rgba(251, 191, 36, 0.6); }
         }
-        @keyframes ampJump { 0%, 55%, 75%, 100% { transform: translateY(0); } 65% { transform: translateY(-20px); } }
+        @keyframes ampJump { 0%, 55%, 75%, 100% { transform: translateY(0); } 65% { transform: translateY(-10px); } }
 
         .w1 { animation: wordPulse 3s infinite 0.0s; }
         .w_amp { color: #a855f7 !important; margin: 0 0.5vw; animation: ampJump 3s infinite; }
         .w2 { animation: wordPulse 3s infinite 0.6s; }
         .w3 { animation: wordPulse 3s infinite 1.2s; }
-        .w4 { animation: wordPulse 3s infinite 1.8s; } /* Women's */
-        .w5 { animation: wordPulse 3s infinite 2.4s; } /* Health */
+        .w4 { animation: wordPulse 3s infinite 1.8s; }
+        .w5 { animation: wordPulse 3s infinite 2.4s; }
 
         .stats-box { pointer-events: auto; width: 100%; }
-        .label { font-size: 1.6vw; color: #38bdf8; text-transform: uppercase; font-weight: 900; letter-spacing: 3px; }
-        .count { font-size: 6.8vw; font-weight: 900; color: #fbbf24; line-height: 1; margin: 5px 0; }
+        .label { font-size: 2.2vh; color: #38bdf8; text-transform: uppercase; font-weight: 900; letter-spacing: 2px; }
         
-        .progress-ui { width: 85%; margin-top: 15px; }
-        .bar-wrapper { width: 100%; height: 16px; background: rgba(255,255,255,0.05); border-radius: 20px; overflow: hidden; margin-top: 8px; }
-        .bar-fill { height: 100%; width: 0%; background: #fbbf24; box-shadow: 0 0 15px #fbbf24; }
-        #clock { color: #fbbf24; font-size: 1.8vw; font-weight: bold; display: block; text-align: center; margin-top: 12px; }
+        /* REDUCED SIZE FOR 540 HEIGHT */
+        .count { font-size: 11vh; font-weight: 900; color: #fbbf24; line-height: 1; margin: 0; }
+        
+        .progress-ui { width: 90%; margin-top: 5px; }
+        .bar-wrapper { width: 100%; height: 10px; background: rgba(255,255,255,0.1); border-radius: 20px; overflow: hidden; margin-top: 4px; }
+        .bar-fill { height: 100%; width: 0%; background: #fbbf24; box-shadow: 0 0 10px #fbbf24; }
+        #clock { color: #fbbf24; font-size: 2.8vh; font-weight: bold; display: block; text-align: center; margin-top: 5px; }
 
         /* 4. CANVAS */
         .stars-container { position: absolute; width: 100%; height: 100%; z-index: 1; pointer-events: none; }
@@ -79,7 +81,7 @@
         #main-canvas { width: 100%; height: 100%; cursor: grab; }
         #main-canvas:active { cursor: grabbing; }
 
-        #loading { position: absolute; width: 100%; height: 100%; background: #000000; display: flex; align-items: center; justify-content: center; z-index: 11000; color: #38bdf8; font-size: 2.5vw; }
+        #loading { position: absolute; width: 100%; height: 100%; background: #000000; display: flex; align-items: center; justify-content: center; z-index: 11000; color: #38bdf8; font-size: 4vh; }
     </style>
 </head>
 <body>
@@ -89,29 +91,29 @@
     
     <div id="quiz-overlay">
         <div class="quiz-card">
-            <h2 id="quiz-question" class="text-3xl font-bold mb-8 text-white">Question</h2>
+            <h2 id="quiz-question" class="text-2xl font-bold mb-4 text-white">Question</h2>
             <div id="quiz-options"></div>
-            <div id="quiz-feedback" class="mt-4"></div>
+            <div id="quiz-feedback" class="mt-2"></div>
         </div>
     </div>
 
-    <button class="knowledge-btn" id="quiz-trigger" onclick="openQuiz()">Press here for Knowledge check</button>
+    <button class="knowledge-btn" id="quiz-trigger" onclick="openQuiz()">Knowledge check</button>
 
     <div class="ui-root">
         <div class="header-box">
             <div class="philips-title">PHILIPS</div>
             <h1 class="main-heading">
-                <span class="w1">Mother</span> <span class="w_amp">&</span> <span class="w2">Child</span> <span class="w3">Care</span> — <span class="w4">Women's</span> <span class="w5">Health</span>
+                <span class="w1">Mother</span> <span class="w_amp">&</span> <span class="w2">Child</span> <span class="w3">Care</span>
             </h1>
         </div>
 
         <div class="stats-box">
-            <span class="label">Global Birth Count Today</span>
+            <span class="label">Birth Count Today</span>
             <div id="birthCount" class="count">0</div>
             <div class="progress-ui">
                 <div class="flex justify-between w-[100%] mb-1 px-1">
-                    <span class="text-cyan-400 font-bold text-[1.1vw]">00:00</span>
-                    <span class="text-cyan-400 font-bold text-[1.1vw]">24:00</span>
+                    <span class="text-cyan-400 font-bold text-[1.8vh]">00:00</span>
+                    <span class="text-cyan-400 font-bold text-[1.8vh]">24:00</span>
                 </div>
                 <div class="bar-wrapper"><div id="bar" class="bar-fill"></div></div>
                 <span id="clock">00:00:00</span>
@@ -123,10 +125,8 @@
     <div class="canvas-container"><canvas id="main-canvas"></canvas></div>
 
     <script>
-        // --- TV-SAFE ES5 SCRIPT ---
         var BIRTH_RATE = 4.34, EARTH_ROT_SPD = 0.008, RESUME_DELAY = 5000, TARGET_TILT = -15;
 
-        // --- QUIZ DATA ---
         var quizData = [
             { q: "In which year was Philips founded?", o: ["1885", "1891", "1905", "1912"], a: 1 },
             { q: "Who founded Philips?", o: ["Gerard & Frederik", "Anton & Gerard", "Willem & Anton", "Gerard & Siemens"], a: 1 },
@@ -146,29 +146,28 @@
                 btn.onclick = (function(idx, correct, correctText) {
                     return function() {
                         if (idx === correct) { fBox.innerHTML = "<span style='color:#4ade80'>👍 Thumbs Up!</span>"; } 
-                        else { fBox.innerHTML = "<span style='color:#f43f5e'>Better luck next time.</span><br><span style='color:white; font-size:1.5vw; font-weight:normal;'>Correct: " + correctText + "</span>"; }
-                        setTimeout(function(){ overlay.style.display = "none"; }, 4000);
+                        else { fBox.innerHTML = "<span style='color:#f43f5e'>Correct: " + correctText + "</span>"; }
+                        setTimeout(function(){ overlay.style.display = "none"; }, 3000);
                     };
                 })(i, qObj.a, qObj.o[qObj.a]);
                 oBox.appendChild(btn);
             }
         }
 
-        // --- PHYSICS ENGINE ---
-        var moon = { d:380, sz:60, spd:0.0012, ang:Math.random()*7, col:"#f0f9ff", craters:[] };
-        for(var i=0; i<20; i++) moon.craters.push({x:(Math.random()-0.5)*100, y:(Math.random()-0.5)*100, r:Math.random()*5+1, op:Math.random()*0.3});
-        var saturn = { d:650, sz:32, spd:0.0002, ang:Math.random()*7, col: "#d8ae8d" };
-        var planets = [{id:'mer',d:130,sz:6,spd:0.0008,col:"#A5A5A5",ang:Math.random()*7},{id:'jup',d:530,sz:28,spd:0.0003,col:"#c3a48e",ang:Math.random()*7}];
+        var moon = { d:300, sz:45, spd:0.0012, ang:Math.random()*7, col:"#f0f9ff" };
+        var saturn = { d:500, sz:25, spd:0.0002, ang:Math.random()*7, col: "#d8ae8d" };
+        var planets = [{id:'mer',d:120,sz:5,spd:0.0008,col:"#A5A5A5",ang:Math.random()*7}];
         var worldGeo = null, featureIndex = {}, flashingISO = {}, comets = [];
         var canvas = document.getElementById("main-canvas"), context = canvas.getContext("2d");
         var w, h, isDragging = false, lastX, lastY, rotX = 0, rotY = TARGET_TILT, lastT = Date.now(), lastIntT = Date.now();
 
         function setSizes() { w = window.innerWidth; h = window.innerHeight; canvas.width = w; canvas.height = h; }
         setSizes();
-        var projection = d3.geoOrthographic().scale(h/2.8).translate([w*0.74, h*0.5]).clipAngle(90);
+        
+        // ADJUSTED PROJECTION SCALE FOR 1920x540
+        var projection = d3.geoOrthographic().scale(h/2.1).translate([w*0.74, h*0.5]).clipAngle(90);
         var path = d3.geoPath(projection, context);
 
-        // --- FIXED UNIVERSAL DRAG ---
         function startDrag(x, y) { isDragging = true; lastX = x; lastY = y; lastIntT = Date.now(); }
         function moveDrag(x, y) { 
             if (isDragging) {
@@ -182,20 +181,6 @@
         window.addEventListener('mousemove', function(e) { moveDrag(e.clientX, e.clientY); });
         window.addEventListener('mouseup', endDrag);
 
-        canvas.addEventListener('touchstart', function(e) { 
-            if (e.touches.length > 0) { e.preventDefault(); startDrag(e.touches[0].clientX, e.touches[0].clientY); }
-        }, {passive: false});
-        window.addEventListener('touchmove', function(e) { 
-            if (e.touches.length > 0) { e.preventDefault(); moveDrag(e.touches[0].clientX, e.touches[0].clientY); }
-        }, {passive: false});
-        window.addEventListener('touchend', endDrag);
-
-        function checkSleep() {
-            var hr = new Date().getHours();
-            document.getElementById('sleep-overlay').style.display = (hr >= 20 || hr < 6) ? 'block' : 'none';
-        }
-        setInterval(checkSleep, 30000);
-
         function init() {
             d3.json("https://raw.githubusercontent.com/nvkelso/natural-earth-vector/master/geojson/ne_110m_admin_0_countries.geojson").then(function(data) {
                 worldGeo = data;
@@ -207,96 +192,46 @@
 
         function renderLoop() {
             var now = Date.now(), dt = now - lastT; lastT = now;
-            
-            // --- AUTO RESUME LOGIC ---
-            if (!isDragging) {
-                if (now - lastIntT > RESUME_DELAY) {
-                    rotX += EARTH_ROT_SPD * dt;
-                    if (Math.abs(rotY - TARGET_TILT) > 0.1) rotY += (TARGET_TILT - rotY) * 0.02;
-                    else rotY = TARGET_TILT;
-                }
+            if (!isDragging && now - lastIntT > RESUME_DELAY) {
+                rotX += EARTH_ROT_SPD * dt;
+                if (Math.abs(rotY - TARGET_TILT) > 0.1) rotY += (TARGET_TILT - rotY) * 0.02;
             }
 
             projection.rotate([rotX, rotY]);
             context.clearRect(0,0,w,h);
             var ex=w*0.74, ey=h*0.5;
 
-            var sAng = now * 0.00003, sx = ex + Math.cos(sAng)*(w*0.55), sy = ey + Math.sin(sAng)*(h*0.4);
-            var sGrad = context.createRadialGradient(sx,sy,0,sx,sy,60);
-            sGrad.addColorStop(0,"#ffffff"); sGrad.addColorStop(0.3,"#fbbf24"); sGrad.addColorStop(1,"transparent");
-            context.beginPath(); context.arc(sx,sy,60,0,7); context.fillStyle=sGrad; context.fill();
+            var sAng = now * 0.00003, sx = ex + Math.cos(sAng)*(w*0.4), sy = ey + Math.sin(sAng)*(h*0.3);
+            var sGrad = context.createRadialGradient(sx,sy,0,sx,sy,40);
+            sGrad.addColorStop(0,"#ffffff"); sGrad.addColorStop(1,"transparent");
+            context.beginPath(); context.arc(sx,sy,40,0,7); context.fillStyle=sGrad; context.fill();
 
-            drawMoon(moon, ex, ey, sx, sy, dt);
-            drawSaturn(saturn, ex, ey, sx, sy, dt);
-            for(var i=0; i<planets.length; i++) drawPlanet(planets[i], ex, ey, sx, sy, dt);
+            drawPlanet(moon, ex, ey, sx, sy, dt);
+            drawPlanet(saturn, ex, ey, sx, sy, dt);
 
             var radius = projection.scale();
-            var oceanGrad = context.createRadialGradient(ex-radius/2.5, ey-radius/2.5, radius/20, ex, ey, radius);
-            oceanGrad.addColorStop(0, "#3b82f6"); oceanGrad.addColorStop(0.5, "#0a192f"); oceanGrad.addColorStop(1, "#020617");
+            var oceanGrad = context.createRadialGradient(ex-radius/3, ey-radius/3, radius/20, ex, ey, radius);
+            oceanGrad.addColorStop(0, "#3b82f6"); oceanGrad.addColorStop(1, "#020617");
             context.beginPath(); context.arc(ex, ey, radius, 0, 7); context.fillStyle = oceanGrad; context.fill();
 
             if (worldGeo) {
                 context.beginPath(); path(worldGeo); context.fillStyle = "#10b981"; context.fill();
-                context.strokeStyle = "rgba(255,255,255,0.3)"; context.lineWidth = 0.6; context.stroke();
-                for (var iso in flashingISO) {
-                    if (now - flashingISO[iso] < 1500) {
-                        var feat = featureIndex[iso];
-                        if(feat) { context.beginPath(); path(feat); context.fillStyle="#ffffff"; context.fill(); context.strokeStyle="white"; context.stroke(); }
-                    } else { delete flashingISO[iso]; }
-                }
+                context.strokeStyle = "rgba(255,255,255,0.2)"; context.stroke();
             }
             updateComets();
             requestAnimationFrame(renderLoop);
         }
 
-        function drawMoon(p, ex, ey, sx, sy, dt) {
-            p.ang += p.spd * dt * 0.1; var px=ex+Math.cos(p.ang)*p.d, py=ey+Math.sin(p.ang)*p.d*0.7;
-            var dx=px-sx, dy=py-sy, ang=Math.atan2(dy,dx);
-            context.save(); context.translate(px,py);
-            context.shadowBlur = 50; context.shadowColor = "#3b82f6";
-            var g = context.createRadialGradient(0, 0, 0, 0, 0, p.sz);
-            g.addColorStop(0, "#ffffff"); g.addColorStop(0.6, "#dbeafe"); g.addColorStop(1, "#93c5fd");
-            context.beginPath(); context.arc(0, 0, p.sz, 0, 7); context.fillStyle = g; context.fill();
-            context.clip(); context.fillStyle = "rgba(147, 197, 253, 0.3)";
-            for(var i=0; i<8; i++) { context.beginPath(); context.ellipse(Math.sin(i)*15, Math.cos(i)*10, 20, 12, i, 0, 7); context.fill(); }
-            context.restore();
-            var shad = context.createRadialGradient(px + Math.cos(ang)*p.sz*0.5, py + Math.sin(ang)*p.sz*0.5, 0, px, py, p.sz);
-            shad.addColorStop(0, "rgba(0,0,0,0)"); shad.addColorStop(1, "rgba(0,0,0,0.95)");
-            context.beginPath(); context.arc(px,py,p.sz+0.5,0,7); context.fillStyle=shad; context.fill();
-        }
-
-        function drawSaturn(p,ex,ey,sx,sy,dt){
-            p.ang += p.spd*dt*0.1; var px=ex+Math.cos(p.ang)*p.d, py=ey+Math.sin(p.ang)*p.d*0.65;
-            var dx=px-sx, dy=py-sy, ang=Math.atan2(dy,dx);
-            context.save(); context.translate(px,py);
-            context.globalAlpha=0.6; for(var r=0;r<10;r++){ context.beginPath(); context.ellipse(0,0,p.sz*(1.8+r*0.1),p.sz*(0.6+r*0.03),0.4,0,7); context.strokeStyle="rgba(216, 174, 141, 0.2)"; context.stroke(); }
-            context.globalAlpha=1; var g=context.createRadialGradient(-p.sz*0.3,-p.sz*0.3,0,0,0,p.sz); g.addColorStop(0,p.col); g.addColorStop(1,"#1a0f08");
-            context.beginPath(); context.arc(0,0,p.sz,0,7); context.fillStyle=g; context.fill();
-            context.restore();
-            var shad=context.createRadialGradient(px+Math.cos(ang)*p.sz*0.5, py+Math.sin(ang)*p.sz*0.5, 0, px,py,p.sz);
-            shad.addColorStop(0,"rgba(0,0,0,0)"); shad.addColorStop(1,"rgba(0,0,0,0.9)");
-            context.beginPath(); context.arc(px,py,p.sz+0.5,0,7); context.fillStyle=shad; context.fill();
-        }
-
         function drawPlanet(p,ex,ey,sx,sy,dt){
-            p.ang += p.spd*dt*0.1; var px=ex+Math.cos(p.ang)*p.d, py=ey+Math.sin(p.ang)*p.d*0.7;
-            var dx=px-sx, dy=py-sy, ang=Math.atan2(dy,dx);
-            context.save(); context.translate(px,py);
-            var g=context.createRadialGradient(-p.sz*0.3,-p.sz*0.3,0,0,0,p.sz); g.addColorStop(0,p.col); g.addColorStop(1,"#000");
-            context.beginPath(); context.arc(0,0,p.sz,0,7); context.fillStyle=g; context.fill();
-            context.restore();
-            var shad=context.createRadialGradient(px+Math.cos(ang)*p.sz*0.5, py+Math.sin(ang)*p.sz*0.5, 0, px,py,p.sz);
-            shad.addColorStop(0,"rgba(0,0,0,0)"); shad.addColorStop(1,"rgba(0,0,0,0.9)");
-            context.beginPath(); context.arc(px,py,p.sz+0.5,0,7); context.fillStyle=shad; context.fill();
+            p.ang += p.spd*dt*0.1; var px=ex+Math.cos(p.ang)*p.d, py=ey+Math.sin(p.ang)*p.d*0.5;
+            context.beginPath(); context.arc(px,py,p.sz,0,7); context.fillStyle=p.col || "white"; context.fill();
         }
 
         function updateComets() {
-            if (Math.random() > 0.996) comets.push({ x:Math.random()*w, y:-50, vx:-14, vy:10, life:1 });
+            if (Math.random() > 0.99) comets.push({ x:Math.random()*w, y:-50, vx:-10, vy:8, life:1 });
             for (var i=0; i<comets.length; i++) {
-                var c = comets[i]; var g = context.createLinearGradient(c.x,c.y,c.x-c.vx*12,c.y-c.vy*12);
-                g.addColorStop(0,"white"); g.addColorStop(1,"transparent");
-                context.strokeStyle=g; context.lineWidth=4; context.beginPath(); context.moveTo(c.x,c.y); context.lineTo(c.x+120,c.y-100); context.stroke();
-                c.x+=c.vx; c.y+=c.vy; c.life-=0.008; if(c.life<=0){ comets.splice(i,1); i--; }
+                var c = comets[i]; context.strokeStyle="white"; context.beginPath(); context.moveTo(c.x,c.y); context.lineTo(c.x+20,c.y-20); context.stroke();
+                c.x+=c.vx; c.y+=c.vy; c.life-=0.01; if(c.life<=0){ comets.splice(i,1); i--; }
             }
         }
 
@@ -307,18 +242,15 @@
                 document.getElementById('birthCount').innerText = Math.floor(elapsed * BIRTH_RATE).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
                 document.getElementById('clock').innerText = now.toLocaleTimeString('en-GB');
                 document.getElementById('bar').style.width = (elapsed / 86400 * 100) + "%";
-                if (worldGeo) {
-                    var keys = Object.keys(featureIndex); flashingISO[keys[Math.floor(Math.random()*keys.length)]] = Date.now();
-                }
-            }, 1000 / BIRTH_RATE);
+            }, 500);
         }
 
         var field = document.getElementById('starfield');
-        for (var i = 0; i < 70; i++) {
+        for (var i = 0; i < 50; i++) {
             var s = document.createElement('div'); s.className = 'star';
-            s.style.width = s.style.height = (1 + Math.random()*2) + 'px';
+            s.style.width = s.style.height = (1 + Math.random()) + 'px';
             s.style.left = Math.random()*100 + '%'; s.style.top = Math.random()*100 + '%';
-            s.style.setProperty('--t', (2 + Math.random()*3) + 's');
+            s.style.setProperty('--t', (2 + Math.random()*2) + 's');
             field.appendChild(s);
         }
         window.onresize = setSizes; init();
