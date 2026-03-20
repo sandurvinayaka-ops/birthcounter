@@ -3,14 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Birth Pulse - Cinematic Widescreen</title>
+    <title>Birth Pulse - Philips Professional</title>
     <script src="https://d3js.org/d3.v7.min.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         body, html {
             margin: 0; padding: 0; width: 100vw; height: 100vh;
-            overflow: hidden; background-color: #050a15;
-            font-family: 'Inter', system-ui, sans-serif; color: white;
+            overflow: hidden; background-color: #02040a;
+            font-family: 'Inter', -apple-system, sans-serif; color: white;
             cursor: default; touch-action: none;
         }
 
@@ -21,32 +21,28 @@
             gap: 2.5vh;
         }
 
-        .philips-title { font-size: 3.5vh; font-weight: 900; color: #3b82f6; letter-spacing: 3px; text-transform: uppercase; }
-        .main-heading { font-size: 5vh; color: #f8fafc; font-weight: 800; line-height: 1.1; filter: drop-shadow(0 0 10px rgba(0,0,0,0.5)); }
+        .philips-title { font-size: 3.5vh; font-weight: 900; color: #0b5ed7; letter-spacing: 3px; text-transform: uppercase; }
+        .main-heading { font-size: 5.2vh; color: #ffffff; font-weight: 800; line-height: 1.1; }
         
         .stats-box { pointer-events: auto; width: 100%; }
-        .label { font-size: 2.2vh; color: #7dd3fc; text-transform: uppercase; font-weight: 700; letter-spacing: 2px; }
-        .count { font-size: 13vh; font-weight: 900; color: #fbbf24; line-height: 1; margin: 0.5vh 0; text-shadow: 0 0 25px rgba(251, 191, 36, 0.4); }
+        .label { font-size: 2.2vh; color: #60a5fa; text-transform: uppercase; font-weight: 700; letter-spacing: 2px; }
+        .count { font-size: 13vh; font-weight: 900; color: #fbbf24; line-height: 1; margin: 0.5vh 0; text-shadow: 0 0 30px rgba(251, 191, 36, 0.4); }
         
-        .progress-container { width: 90%; margin-top: 10px; position: relative; }
-        .time-labels { display: flex; justify-content: space-between; margin-bottom: 4px; font-weight: 800; font-size: 1.8vh; color: #60a5fa; }
-        .bar-wrapper { width: 100%; height: 10px; background: rgba(255,255,255,0.05); border-radius: 10px; overflow: hidden; border: 1px solid rgba(255,255,255,0.1); }
-        .bar-fill { height: 100%; width: 0%; background: linear-gradient(90deg, #3b82f6, #60a5fa); box-shadow: 0 0 15px rgba(59, 130, 246, 0.6); }
-        #clock { color: #facc15; font-size: 3vh; font-weight: 700; display: block; text-align: center; margin-top: 1vh; letter-spacing: 2px; }
+        .progress-container { width: 90%; margin-top: 12px; }
+        .time-labels { display: flex; justify-content: space-between; margin-bottom: 6px; font-weight: 700; font-size: 2vh; color: #3b82f6; }
+        .bar-wrapper { width: 100%; height: 12px; background: rgba(255,255,255,0.08); border-radius: 10px; overflow: hidden; border: 1px solid rgba(255,255,255,0.1); }
+        .bar-fill { height: 100%; width: 0%; background: linear-gradient(90deg, #0b5ed7, #60a5fa); box-shadow: 0 0 20px rgba(59, 130, 246, 0.5); }
+        #clock { color: #facc15; font-size: 3.2vh; font-weight: 800; display: block; text-align: center; margin-top: 1.5vh; letter-spacing: 2px; }
 
-        .stars-container { position: absolute; width: 100%; height: 100%; z-index: 1; pointer-events: none; }
-        .star { position: absolute; background: white; border-radius: 50%; animation: blink var(--t) infinite ease-in-out; }
-        @keyframes blink { 0%, 100% { opacity: 0.1; } 50% { opacity: 0.9; } }
-        
         .canvas-container { position: absolute; left: 0; top: 0; width: 100vw; height: 100vh; z-index: 5; }
         #main-canvas { width: 100%; height: 100%; cursor: grab; }
 
-        #loading { position: absolute; width: 100%; height: 100%; background: #000; display: flex; align-items: center; justify-content: center; z-index: 11000; color: #3b82f6; font-size: 3vh; font-weight: bold; }
+        #loading { position: absolute; width: 100%; height: 100%; background: #000; display: flex; align-items: center; justify-content: center; z-index: 11000; color: #0b5ed7; font-size: 3vh; font-weight: 900; }
     </style>
 </head>
 <body>
 
-    <div id="loading">ORCHESTRATING THE UNIVERSE...</div>
+    <div id="loading">CALIBRATING GLOBAL TELEMETRY...</div>
 
     <div class="ui-root">
         <div class="header-box">
@@ -59,7 +55,7 @@
             <div id="birthCount" class="count">0</div>
             <div class="progress-container">
                 <div class="time-labels">
-                    <span>00</span>
+                    <span>00:00</span>
                     <span>24:00</span>
                 </div>
                 <div class="bar-wrapper"><div id="bar" class="bar-fill"></div></div>
@@ -68,19 +64,18 @@
         </div>
     </div>
 
-    <div class="stars-container" id="starfield"></div>
     <div class="canvas-container"><canvas id="main-canvas"></canvas></div>
 
     <script>
-        var BIRTH_RATE = 4.34, EARTH_ROT_SPD = 0.012, RESUME_DELAY = 3000, TARGET_TILT = -15;
-        var worldGeo = null, flashingCountries = [], stars = [];
+        var BIRTH_RATE = 4.34, EARTH_ROT_SPD = 0.015, RESUME_DELAY = 3000, TARGET_TILT = -18;
+        var worldGeo = null, flashingCountries = [];
         var canvas = document.getElementById("main-canvas"), context = canvas.getContext("2d");
         var w, h, rotX = 0, rotY = TARGET_TILT, lastT = Date.now(), lastIntT = Date.now(), isDragging = false;
 
         function setSizes() { w = window.innerWidth; h = window.innerHeight; canvas.width = w; canvas.height = h; }
         setSizes();
         
-        var projection = d3.geoOrthographic().scale(h/2.1).translate([w*0.73, h*0.5]).clipAngle(90);
+        var projection = d3.geoOrthographic().scale(h/2.0).translate([w*0.73, h*0.5]).clipAngle(90);
         var path = d3.geoPath(projection, context);
 
         canvas.addEventListener('mousedown', function(e) { isDragging = true; lastX = e.clientX; lastY = e.clientY; lastIntT = Date.now(); });
@@ -102,59 +97,59 @@
             var now = Date.now(), dt = now - lastT; lastT = now;
             if (!isDragging && now - lastIntT > RESUME_DELAY) {
                 rotX += EARTH_ROT_SPD * dt;
-                rotY += (TARGET_TILT - rotY) * 0.03;
+                rotY += (TARGET_TILT - rotY) * 0.04;
             }
 
             projection.rotate([rotX, rotY]);
             context.clearRect(0,0,w,h);
             var ex=w*0.73, ey=h*0.5, r=projection.scale();
 
-            // 1. DYNAMIC SUN (Orbits the globe)
-            var sTime = now * 0.0001, sx = ex + Math.cos(sTime)*(w*0.35), sy = ey + Math.sin(sTime)*(h*0.25);
+            // 1. DYNAMIC SUN (Bloom Layer)
+            var sTime = now * 0.00008, sx = ex + Math.cos(sTime)*(w*0.38), sy = ey + Math.sin(sTime)*(h*0.28);
             context.save();
-            var sunG = context.createRadialGradient(sx, sy, 0, sx, sy, 70);
-            sunG.addColorStop(0, "#ffffff");
-            sunG.addColorStop(0.2, "#fff9c4");
-            sunG.addColorStop(0.5, "rgba(251, 191, 36, 0.4)");
+            var sunG = context.createRadialGradient(sx, sy, 0, sx, sy, 90);
+            sunG.addColorStop(0, "rgba(255, 255, 255, 1)");
+            sunG.addColorStop(0.3, "rgba(251, 191, 36, 0.6)");
             sunG.addColorStop(1, "transparent");
             context.fillStyle = sunG;
-            context.shadowBlur = 40; context.shadowColor = "#fbbf24";
-            context.beginPath(); context.arc(sx, sy, 70, 0, 7); context.fill();
+            context.shadowBlur = 50; context.shadowColor = "#fbbf24";
+            context.beginPath(); context.arc(sx, sy, 80, 0, 7); context.fill();
             context.restore();
 
-            // 2. ATMOSPHERE GLOW
-            var atmoG = context.createRadialGradient(ex, ey, r, ex, ey, r + 40);
-            atmoG.addColorStop(0, "rgba(59, 130, 246, 0.3)");
+            // 2. ATMOSPHERE
+            var atmoG = context.createRadialGradient(ex, ey, r, ex, ey, r + 50);
+            atmoG.addColorStop(0, "rgba(11, 94, 215, 0.4)");
             atmoG.addColorStop(1, "transparent");
-            context.fillStyle = atmoG; context.beginPath(); context.arc(ex, ey, r + 40, 0, 7); context.fill();
+            context.fillStyle = atmoG; context.beginPath(); context.arc(ex, ey, r + 50, 0, 7); context.fill();
 
-            // 3. OCEAN
-            var oG = context.createRadialGradient(ex-r/3, ey-r/3, r/10, ex, ey, r);
-            oG.addColorStop(0, "#0f172a"); oG.addColorStop(1, "#020617");
+            // 3. OCEAN (Deep Velvet Blue)
+            var oG = context.createRadialGradient(ex-r/4, ey-r/4, r/10, ex, ey, r);
+            oG.addColorStop(0, "#0a192f"); oG.addColorStop(1, "#02040a");
             context.fillStyle = oG; context.beginPath(); context.arc(ex, ey, r, 0, 7); context.fill();
 
             // 4. COUNTRIES
             if (worldGeo) {
                 context.beginPath(); path(worldGeo); 
-                context.fillStyle = "#1e293b"; context.fill();
-                context.strokeStyle = "rgba(255,255,255,0.08)"; context.stroke();
+                context.fillStyle = "#16213e"; context.fill();
+                context.strokeStyle = "rgba(100,149,237,0.15)"; context.lineWidth = 0.8; context.stroke();
 
-                // BIRTH FLASHES
+                // BIRTH PULSE
                 var currentNow = Date.now();
                 flashingCountries.forEach((f, idx) => {
                     var age = currentNow - f.time;
-                    if (age < 1200) {
+                    if (age < 1500) {
                         context.save();
-                        context.globalAlpha = 1 - (age/1200);
-                        context.fillStyle = "#ffffff";
-                        context.shadowBlur = 15; context.shadowColor = "#60a5fa";
+                        var alpha = 1 - (age/1500);
+                        context.globalAlpha = alpha;
+                        context.fillStyle = "#60a5fa"; // Medical Cyan/Blue
+                        context.shadowBlur = 20 * alpha; context.shadowColor = "#ffffff";
                         context.beginPath(); path(f.feature); context.fill();
                         context.restore();
                     } else { flashingCountries.splice(idx, 1); }
                 });
             }
 
-            // 5. PLANETARY SHADOW (Facing away from Sun)
+            // 5. TERMINATOR (Shadow)
             var eSA = Math.atan2(ey-sy, ex-sx);
             var eSh = context.createRadialGradient(ex + Math.cos(eSA)*r*0.6, ey + Math.sin(eSA)*r*0.6, 0, ex, ey, r);
             eSh.addColorStop(0, "transparent"); eSh.addColorStop(1, "rgba(0,0,0,0.85)");
@@ -173,20 +168,12 @@
                 document.getElementById('bar').style.width = (elapsed / 86400 * 100) + "%";
 
                 if (worldGeo) {
-                    var randomFeature = worldGeo.features[Math.floor(Math.random() * worldGeo.features.length)];
-                    flashingCountries.push({ feature: randomFeature, time: Date.now() });
+                    var rf = worldGeo.features[Math.floor(Math.random() * worldGeo.features.length)];
+                    flashingCountries.push({ feature: rf, time: Date.now() });
                 }
-            }, 1000 / (BIRTH_RATE / 1.5));
+            }, 1000 / (BIRTH_RATE / 1.8));
         }
 
-        var field = document.getElementById('starfield');
-        for (var i = 0; i < 70; i++) {
-            var s = document.createElement('div'); s.className = 'star';
-            s.style.width = s.style.height = (Math.random()*2.5) + 'px';
-            s.style.left = Math.random()*100 + '%'; s.style.top = Math.random()*100 + '%';
-            s.style.setProperty('--t', (1.5 + Math.random()*3) + 's');
-            field.appendChild(s);
-        }
         window.onresize = setSizes; init();
     </script>
 </body>
