@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Birth Pulse - High Visibility Philips</title>
+    <title>Birth Pulse - Final TV Master</title>
     <script src="https://d3js.org/d3.v7.min.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
@@ -14,13 +14,21 @@
             cursor: default; touch-action: none;
         }
 
-        /* BRANDING - TOP LEFT */
+        /* BRANDING - TOP LEFT SINGLE LINE WITH GLOW */
         .branding-header {
             position: absolute; top: 3vh; left: 3vw;
             z-index: 1000; pointer-events: none;
+            display: flex; align-items: baseline; gap: 20px;
         }
-        .philips-title { font-size: 2.8vh; font-weight: 900; color: #3b82f6; letter-spacing: 3px; text-transform: uppercase; }
-        .main-heading { font-size: 4vh; color: #a855f7; font-weight: 800; line-height: 1.1; }
+        .philips-title { 
+            font-size: 2.8vh; font-weight: 900; color: #3b82f6; 
+            letter-spacing: 3px; text-transform: uppercase; 
+        }
+        .main-heading { 
+            font-size: 3.5vh; color: #a855f7; font-weight: 800; 
+            white-space: nowrap;
+            text-shadow: 0 0 15px rgba(168, 85, 247, 0.6), 0 0 30px rgba(168, 85, 247, 0.2);
+        }
 
         /* UI COUNTER - 80% SCALE CONTAINER */
         .ui-counter-root {
@@ -31,23 +39,16 @@
             transform-origin: left center;
         }
         
-        /* 1.5X SIZE UPDATES */
         .label { 
-            font-size: 3.3vh; /* Increased 1.5x from ~2.2vh */
-            color: #a855f7;  /* Switched to Purple */
-            text-transform: uppercase; 
-            font-weight: 800; 
-            letter-spacing: 2px;
-            margin-bottom: 1vh;
-            display: block;
+            font-size: 3.3vh; color: #a855f7; 
+            text-transform: uppercase; font-weight: 800; 
+            letter-spacing: 2px; margin-bottom: 1vh; display: block;
+            text-shadow: 0 0 10px rgba(168, 85, 247, 0.4);
         }
         .count { 
-            font-size: 19.5vh; /* Increased 1.5x from ~13vh */
-            font-weight: 900; 
-            color: #fbbf24; 
-            line-height: 0.9; 
-            margin: 0; 
-            text-shadow: 0 0 40px rgba(251, 191, 36, 0.5); 
+            font-size: 19.5vh; font-weight: 900; 
+            color: #fbbf24; line-height: 0.9; margin: 0; 
+            text-shadow: 0 0 45px rgba(251, 191, 36, 0.5); 
         }
         
         .progress-container { width: 100%; margin-top: 20px; }
@@ -70,7 +71,7 @@
 
     <div class="branding-header">
         <div class="philips-title">Philips</div>
-        <h1 class="main-heading">Mother & Child Care<br>Womens Health</h1>
+        <h1 class="main-heading">Mother & Child Care Womens Health</h1>
     </div>
 
     <div class="ui-counter-root">
@@ -90,15 +91,19 @@
     <div class="canvas-container"><canvas id="main-canvas"></canvas></div>
 
     <script>
-        var BIRTH_RATE = 4.34, EARTH_ROT_SPD = 0.018, TARGET_TILT = -18;
+        var BIRTH_RATE = 4.34, EARTH_ROT_SPD = 0.00002, TARGET_TILT = -18;
         var worldGeo = null, flashingCountries = [], comets = [];
         var canvas = document.getElementById("main-canvas"), context = canvas.getContext("2d");
-        var w, h, rotX = 0, rotY = TARGET_TILT, lastT = Date.now();
+        var w, h, rotX = 0;
+        var lastTimestamp = 0;
 
-        function setSizes() { w = window.innerWidth; h = window.innerHeight; canvas.width = w; canvas.height = h; }
+        function setSizes() { 
+            w = window.innerWidth; h = window.innerHeight; 
+            canvas.width = w; canvas.height = h; 
+        }
         setSizes();
         
-        var projection = d3.geoOrthographic().scale(h/1.8).translate([w*0.75, h*0.55]).clipAngle(90);
+        var projection = d3.geoOrthographic().scale(h/2.2).translate([w*0.75, h*0.55]).clipAngle(90);
         var path = d3.geoPath(projection, context);
 
         function init() {
@@ -109,22 +114,26 @@
             });
         }
 
-        function renderLoop() {
-            var now = Date.now(), dt = now - lastT; lastT = now;
-            rotX += EARTH_ROT_SPD * dt;
-            projection.rotate([rotX, rotY]);
+        function renderLoop(timestamp) {
+            if (!lastTimestamp) lastTimestamp = timestamp;
+            var deltaTime = timestamp - lastTimestamp;
+            lastTimestamp = timestamp;
+
+            rotX += EARTH_ROT_SPD * deltaTime * 360; 
+            projection.rotate([rotX, TARGET_TILT]);
+            
             context.clearRect(0,0,w,h);
             var ex=w*0.75, ey=h*0.55, r=projection.scale();
 
             updateComets(context);
 
             // GOLDEN SUN
-            var sTime = now * 0.0001, sx = ex + Math.cos(sTime)*(w*0.4), sy = ey + Math.sin(sTime)*(h*0.3);
+            var sTime = timestamp * 0.0001, sx = ex + Math.cos(sTime)*(w*0.4), sy = ey + Math.sin(sTime)*(h*0.3);
             var sunG = context.createRadialGradient(sx, sy, 0, sx, sy, 120);
             sunG.addColorStop(0, "#ffffff"); sunG.addColorStop(0.3, "#fbbf24"); sunG.addColorStop(1, "transparent");
             context.fillStyle = sunG; context.beginPath(); context.arc(sx, sy, 110, 0, 7); context.fill();
 
-            // OCEAN & GLOBE
+            // OCEAN
             var oG = context.createRadialGradient(ex-r/4, ey-r/4, r/5, ex, ey, r);
             oG.addColorStop(0, "#2563eb"); oG.addColorStop(0.6, "#1e3a8a"); oG.addColorStop(1, "#0f172a");
             context.fillStyle = oG; context.beginPath(); context.arc(ex, ey, r, 0, 7); context.fill();
@@ -147,20 +156,20 @@
                 });
             }
 
-            // SHADOW LAYER
+            // SHADOW
             var eSA = Math.atan2(ey-sy, ex-sx);
             var eSh = context.createRadialGradient(ex + Math.cos(eSA)*r*0.6, ey + Math.sin(eSA)*r*0.6, 0, ex, ey, r);
-            eSh.addColorStop(0, "transparent"); eSh.addColorStop(1, "rgba(0,0,0,0.6)");
+            eSh.addColorStop(0, "transparent"); eSh.addColorStop(1, "rgba(0,0,0,0.65)");
             context.fillStyle = eSh; context.beginPath(); context.arc(ex, ey, r+1, 0, 7); context.fill();
 
             requestAnimationFrame(renderLoop);
         }
 
         function updateComets(ctx) {
-            if (Math.random() < 0.01) comets.push({ x: Math.random()*w, y: -50, v: 5+Math.random()*7, angle: Math.PI/4, len: 50+Math.random()*50, life: 1.0 });
+            if (Math.random() < 0.01) comets.push({ x: Math.random()*w, y: -50, v: 5+Math.random()*7, len: 70, life: 1.0 });
             comets.forEach((c, i) => {
-                c.x -= c.v; c.y += c.v; c.life -= 0.005;
-                ctx.strokeStyle = `rgba(255, 255, 255, ${c.life})`; ctx.lineWidth = 2; ctx.beginPath();
+                c.x -= c.v; c.y += c.v; c.life -= 0.007;
+                ctx.strokeStyle = `rgba(255, 255, 255, ${c.life})`; ctx.lineWidth = 2.5; ctx.beginPath();
                 ctx.moveTo(c.x, c.y); ctx.lineTo(c.x + c.len, c.y - c.len); ctx.stroke();
                 if (c.life <= 0) comets.splice(i, 1);
             });
@@ -173,7 +182,6 @@
                 document.getElementById('birthCount').innerText = Math.floor(elapsed * BIRTH_RATE).toLocaleString('de-DE');
                 document.getElementById('clock').innerText = now.toLocaleTimeString('en-GB');
                 document.getElementById('bar').style.width = (elapsed / 86400 * 100) + "%";
-
                 if (worldGeo) {
                     var rf = worldGeo.features[Math.floor(Math.random() * worldGeo.features.length)];
                     flashingCountries.push({ feature: rf, time: Date.now() });
@@ -182,12 +190,12 @@
         }
 
         var field = document.getElementById('starfield');
-        for (var i = 0; i < 150; i++) {
+        for (var i = 0; i < 200; i++) {
             var s = document.createElement('div'); s.className = 'star';
             var size = Math.random() * 3;
             s.style.width = s.style.height = size + 'px';
             s.style.left = Math.random() * 100 + '%'; s.style.top = Math.random() * 100 + '%';
-            s.style.setProperty('--t', (1.5 + Math.random() * 3) + 's');
+            s.style.setProperty('--t', (1.2 + Math.random() * 4) + 's');
             field.appendChild(s);
         }
 
