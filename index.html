@@ -3,65 +3,63 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Birth Pulse - Final TV Master</title>
+    <title>Birth Pulse - Philips TV Professional</title>
     <script src="https://d3js.org/d3.v7.min.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         body, html {
             margin: 0; padding: 0; width: 100vw; height: 100vh;
-            overflow: hidden; background-color: #010409;
+            overflow: hidden; background-color: #010408;
             font-family: 'Inter', sans-serif; color: white;
             cursor: default; touch-action: none;
         }
 
-        /* BRANDING - TOP LEFT SINGLE LINE WITH GLOW */
+        /* BRANDING - TWO LINE STACK TOP LEFT */
         .branding-header {
-            position: absolute; top: 3vh; left: 3vw;
+            position: absolute; top: 4vh; left: 4vw;
             z-index: 1000; pointer-events: none;
-            display: flex; align-items: baseline; gap: 20px;
+            display: flex; flex-direction: column; gap: 0.2vh;
         }
         .philips-title { 
-            font-size: 2.8vh; font-weight: 900; color: #3b82f6; 
-            letter-spacing: 3px; text-transform: uppercase; 
+            font-size: 3.5vh; font-weight: 900; color: #3b82f6; 
+            letter-spacing: 4px; text-transform: uppercase; 
         }
         .main-heading { 
-            font-size: 3.5vh; color: #a855f7; font-weight: 800; 
-            white-space: nowrap;
-            text-shadow: 0 0 15px rgba(168, 85, 247, 0.6), 0 0 30px rgba(168, 85, 247, 0.2);
+            font-size: 4.2vh; color: #a855f7; font-weight: 800; 
+            text-shadow: 0 0 20px rgba(168, 85, 247, 0.5);
         }
 
-        /* UI COUNTER - 80% SCALE CONTAINER */
+        /* UI COUNTER - 80% SCALE */
         .ui-counter-root {
-            position: absolute; left: 3vw; top: 40%; 
+            position: absolute; left: 4vw; top: 42%; 
             width: 45vw; z-index: 500; pointer-events: none;
             display: flex; flex-direction: column; justify-content: center;
-            transform: scale(0.8);
+            transform: scale(0.85);
             transform-origin: left center;
         }
         
         .label { 
             font-size: 3.3vh; color: #a855f7; 
             text-transform: uppercase; font-weight: 800; 
-            letter-spacing: 2px; margin-bottom: 1vh; display: block;
-            text-shadow: 0 0 10px rgba(168, 85, 247, 0.4);
+            letter-spacing: 2px; margin-bottom: 0.5vh; display: block;
         }
         .count { 
-            font-size: 19.5vh; font-weight: 900; 
-            color: #fbbf24; line-height: 0.9; margin: 0; 
-            text-shadow: 0 0 45px rgba(251, 191, 36, 0.5); 
+            font-size: 19vh; font-weight: 900; 
+            color: #fbbf24; line-height: 0.85; margin: 0; 
+            text-shadow: 0 0 50px rgba(251, 191, 36, 0.4); 
         }
         
-        .progress-container { width: 100%; margin-top: 20px; }
-        .bar-wrapper { width: 100%; height: 16px; background: rgba(255,255,255,0.05); border-radius: 10px; overflow: hidden; border: 1px solid rgba(168, 85, 247, 0.4); }
-        .bar-fill { height: 100%; width: 0%; background: linear-gradient(90deg, #fbbf24, #f59e0b); box-shadow: 0 0 20px rgba(251, 191, 36, 0.6); }
-        .time-labels { display: flex; justify-content: space-between; margin-top: 8px; font-weight: 800; font-size: 2.5vh; color: #a855f7; }
+        .progress-container { width: 100%; margin-top: 25px; }
+        .bar-wrapper { width: 100%; height: 18px; background: rgba(255,255,255,0.05); border-radius: 20px; overflow: hidden; border: 1px solid rgba(168, 85, 247, 0.3); }
+        .bar-fill { height: 100%; width: 0%; background: linear-gradient(90deg, #fbbf24, #f59e0b); box-shadow: 0 0 25px rgba(251, 191, 36, 0.5); }
+        .time-labels { display: flex; justify-content: space-between; margin-top: 10px; font-weight: 800; font-size: 2.8vh; color: #a855f7; }
         
-        #clock { color: #fbbf24; font-size: 4vh; font-weight: 800; display: block; text-align: center; margin-top: 2vh; letter-spacing: 3px; }
+        #clock { color: #fbbf24; font-size: 4.2vh; font-weight: 800; display: block; text-align: center; margin-top: 2.5vh; letter-spacing: 4px; }
 
-        /* SPACE ENVIRONMENT */
+        /* STARS */
         .stars-container { position: absolute; width: 100%; height: 100%; z-index: 1; pointer-events: none; }
         .star { position: absolute; background: white; border-radius: 50%; animation: blink var(--t) infinite ease-in-out; }
-        @keyframes blink { 0%, 100% { opacity: 0.2; transform: scale(0.8); } 50% { opacity: 1; transform: scale(1.3); box-shadow: 0 0 10px #fff; } }
+        @keyframes blink { 0%, 100% { opacity: 0.3; transform: scale(0.8); } 50% { opacity: 1; transform: scale(1.2); box-shadow: 0 0 8px #fff; } }
 
         .canvas-container { position: absolute; left: 0; top: 0; width: 100vw; height: 100vh; z-index: 5; }
         #main-canvas { width: 100%; height: 100%; }
@@ -71,7 +69,7 @@
 
     <div class="branding-header">
         <div class="philips-title">Philips</div>
-        <h1 class="main-heading">Mother & Child Care Womens Health</h1>
+        <h1 class="main-heading">Mother & Child Care Women's Health</h1>
     </div>
 
     <div class="ui-counter-root">
@@ -91,11 +89,10 @@
     <div class="canvas-container"><canvas id="main-canvas"></canvas></div>
 
     <script>
-        var BIRTH_RATE = 4.34, EARTH_ROT_SPD = 0.00002, TARGET_TILT = -18;
+        var BIRTH_RATE = 4.34, EARTH_ROT_SPD = 0.0065, TARGET_TILT = -18;
         var worldGeo = null, flashingCountries = [], comets = [];
         var canvas = document.getElementById("main-canvas"), context = canvas.getContext("2d");
-        var w, h, rotX = 0;
-        var lastTimestamp = 0;
+        var w, h, rotX = 0, lastTimestamp = 0;
 
         function setSizes() { 
             w = window.innerWidth; h = window.innerHeight; 
@@ -103,7 +100,8 @@
         }
         setSizes();
         
-        var projection = d3.geoOrthographic().scale(h/2.2).translate([w*0.75, h*0.55]).clipAngle(90);
+        // Globe Scale set to 80% visibility
+        var projection = d3.geoOrthographic().scale(h/2.3).translate([w*0.75, h*0.55]).clipAngle(90);
         var path = d3.geoPath(projection, context);
 
         function init() {
@@ -116,61 +114,82 @@
 
         function renderLoop(timestamp) {
             if (!lastTimestamp) lastTimestamp = timestamp;
-            var deltaTime = timestamp - lastTimestamp;
+            var dt = timestamp - lastTimestamp;
             lastTimestamp = timestamp;
 
-            rotX += EARTH_ROT_SPD * deltaTime * 360; 
+            // Ultra-Smooth Time-Based Rotation
+            rotX += EARTH_ROT_SPD * dt;
             projection.rotate([rotX, TARGET_TILT]);
             
             context.clearRect(0,0,w,h);
             var ex=w*0.75, ey=h*0.55, r=projection.scale();
 
-            updateComets(context);
+            // 1. REALISTIC COMETS
+            updateRealisticComets(context);
 
-            // GOLDEN SUN
-            var sTime = timestamp * 0.0001, sx = ex + Math.cos(sTime)*(w*0.4), sy = ey + Math.sin(sTime)*(h*0.3);
-            var sunG = context.createRadialGradient(sx, sy, 0, sx, sy, 120);
-            sunG.addColorStop(0, "#ffffff"); sunG.addColorStop(0.3, "#fbbf24"); sunG.addColorStop(1, "transparent");
-            context.fillStyle = sunG; context.beginPath(); context.arc(sx, sy, 110, 0, 7); context.fill();
+            // 2. GOLDEN SUN
+            var sTime = timestamp * 0.00008, sx = ex + Math.cos(sTime)*(w*0.35), sy = ey + Math.sin(sTime)*(h*0.25);
+            var sunG = context.createRadialGradient(sx, sy, 0, sx, sy, 130);
+            sunG.addColorStop(0, "#ffffff"); sunG.addColorStop(0.2, "#fbbf24"); sunG.addColorStop(1, "transparent");
+            context.fillStyle = sunG; context.beginPath(); context.arc(sx, sy, 120, 0, 7); context.fill();
 
-            // OCEAN
-            var oG = context.createRadialGradient(ex-r/4, ey-r/4, r/5, ex, ey, r);
-            oG.addColorStop(0, "#2563eb"); oG.addColorStop(0.6, "#1e3a8a"); oG.addColorStop(1, "#0f172a");
+            // 3. OCEAN
+            var oG = context.createRadialGradient(ex-r/3, ey-r/3, r/4, ex, ey, r);
+            oG.addColorStop(0, "#1d4ed8"); oG.addColorStop(0.7, "#1e3a8a"); oG.addColorStop(1, "#020617");
             context.fillStyle = oG; context.beginPath(); context.arc(ex, ey, r, 0, 7); context.fill();
 
+            // 4. COUNTRIES
             if (worldGeo) {
                 context.beginPath(); path(worldGeo); 
                 context.fillStyle = "#cbd5e1"; context.fill();
-                context.strokeStyle = "rgba(255, 255, 255, 0.6)"; context.lineWidth = 1; context.stroke();
+                context.strokeStyle = "rgba(255, 255, 255, 0.5)"; context.lineWidth = 1; context.stroke();
 
                 var currentNow = Date.now();
                 flashingCountries.forEach((f, idx) => {
                     var age = currentNow - f.time;
-                    if (age < 1500) {
+                    if (age < 1800) {
                         context.save();
-                        context.globalAlpha = 1 - (age/1500);
-                        context.fillStyle = "#ff00ff"; context.shadowBlur = 40; context.shadowColor = "#ffffff";
+                        context.globalAlpha = 1 - (age/1800);
+                        context.fillStyle = "#f472b6"; context.shadowBlur = 35; context.shadowColor = "#ffffff";
                         context.beginPath(); path(f.feature); context.fill();
                         context.restore();
                     } else { flashingCountries.splice(idx, 1); }
                 });
             }
 
-            // SHADOW
+            // 5. TERMINATOR SHADOW
             var eSA = Math.atan2(ey-sy, ex-sx);
-            var eSh = context.createRadialGradient(ex + Math.cos(eSA)*r*0.6, ey + Math.sin(eSA)*r*0.6, 0, ex, ey, r);
-            eSh.addColorStop(0, "transparent"); eSh.addColorStop(1, "rgba(0,0,0,0.65)");
+            var eSh = context.createRadialGradient(ex + Math.cos(eSA)*r*0.5, ey + Math.sin(eSA)*r*0.5, 0, ex, ey, r);
+            eSh.addColorStop(0, "transparent"); eSh.addColorStop(1, "rgba(0,0,0,0.7)");
             context.fillStyle = eSh; context.beginPath(); context.arc(ex, ey, r+1, 0, 7); context.fill();
 
             requestAnimationFrame(renderLoop);
         }
 
-        function updateComets(ctx) {
-            if (Math.random() < 0.01) comets.push({ x: Math.random()*w, y: -50, v: 5+Math.random()*7, len: 70, life: 1.0 });
+        function updateRealisticComets(ctx) {
+            if (Math.random() < 0.012) {
+                comets.push({
+                    x: Math.random() * w, y: Math.random() * h * 0.5,
+                    vx: -(4 + Math.random() * 6), vy: 4 + Math.random() * 6,
+                    life: 1.0, size: 1 + Math.random() * 2
+                });
+            }
             comets.forEach((c, i) => {
-                c.x -= c.v; c.y += c.v; c.life -= 0.007;
-                ctx.strokeStyle = `rgba(255, 255, 255, ${c.life})`; ctx.lineWidth = 2.5; ctx.beginPath();
-                ctx.moveTo(c.x, c.y); ctx.lineTo(c.x + c.len, c.y - c.len); ctx.stroke();
+                c.x += c.vx; c.y += c.vy; c.life -= 0.006;
+                
+                // Comet Head
+                ctx.fillStyle = `rgba(255, 255, 255, ${c.life})`;
+                ctx.beginPath(); ctx.arc(c.x, c.y, c.size, 0, 7); ctx.fill();
+
+                // Tapered Tail
+                var grad = ctx.createLinearGradient(c.x, c.y, c.x - c.vx*15, c.y - c.vy*15);
+                grad.addColorStop(0, `rgba(255, 255, 255, ${c.life * 0.8})`);
+                grad.addColorStop(0.3, `rgba(59, 130, 246, ${c.life * 0.4})`);
+                grad.addColorStop(1, "transparent");
+                
+                ctx.strokeStyle = grad; ctx.lineWidth = c.size; ctx.lineCap = 'round';
+                ctx.beginPath(); ctx.moveTo(c.x, c.y); ctx.lineTo(c.x - c.vx*15, c.y - c.vy*15); ctx.stroke();
+                
                 if (c.life <= 0) comets.splice(i, 1);
             });
         }
@@ -190,12 +209,12 @@
         }
 
         var field = document.getElementById('starfield');
-        for (var i = 0; i < 200; i++) {
+        for (var i = 0; i < 180; i++) {
             var s = document.createElement('div'); s.className = 'star';
-            var size = Math.random() * 3;
+            var size = Math.random() * 2.5;
             s.style.width = s.style.height = size + 'px';
             s.style.left = Math.random() * 100 + '%'; s.style.top = Math.random() * 100 + '%';
-            s.style.setProperty('--t', (1.2 + Math.random() * 4) + 's');
+            s.style.setProperty('--t', (1.5 + Math.random() * 4) + 's');
             field.appendChild(s);
         }
 
