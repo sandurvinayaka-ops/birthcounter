@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Philips Birth Pulse - cinematic UltraWide</title>
+    <title>Philips Birth Pulse - Final Display Config</title>
     <script src="https://d3js.org/d3.v7.min.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
@@ -15,7 +15,9 @@
 
         .branding-header { position: absolute; top: 6%; left: 3%; z-index: 1000; }
         .philips-title { font-size: 3.5vh; font-weight: 900; color: #3b82f6; letter-spacing: 4px; text-transform: uppercase; }
-        .main-heading { font-size: 4.5vh; color: #a855f7; font-weight: 800; margin-top: 0.5vh; }
+        
+        /* Heading increased 1.3x */
+        .main-heading { font-size: 5.85vh; color: #a855f7; font-weight: 800; margin-top: 0.5vh; }
 
         .ui-group {
             position: absolute; left: 3%; top: 58%; 
@@ -83,10 +85,10 @@
         window.onresize = resize;
         resize();
 
-        // GLOBE MOVED FURTHER LEFT TO ENSURE FULL VISIBILITY (0.68)
+        // GLOBE MOVED UP (0.48) AND LEFT (0.68)
         const projection = d3.geoOrthographic()
             .scale(window.innerHeight * 0.45)
-            .translate([window.innerWidth * 0.68, window.innerHeight * 0.52])
+            .translate([window.innerWidth * 0.68, window.innerHeight * 0.48])
             .clipAngle(90);
         const path = d3.geoPath(projection, ctx);
 
@@ -107,12 +109,12 @@
             ctx.clearRect(0, 0, w, h);
             
             const r = projection.scale();
-            const cx = w * 0.68, cy = h * 0.52;
+            const cx = w * 0.68, cy = h * 0.48; // Updated center
 
-            // LARGER, SMOOTHER BACKGROUND OBJECTS
+            // ORBITING BODIES
             const sunAngle = currentTime * 0.00008;
-            drawPlanet(cx, cy, r * 2.6, sunAngle, 30, "#fbbf24", 1.5); // Sun
-            drawPlanet(cx, cy, r * 1.9, -sunAngle * 1.5, -15, "#e3bb76", 0.5); // Large Orbiting Planet
+            drawPlanet(cx, cy, r * 2.6, sunAngle, 30, "#fbbf24", 1.5); 
+            drawPlanet(cx, cy, r * 1.9, -sunAngle * 1.5, -15, "#e3bb76", 0.5); 
 
             updateComets(ctx, dt, w, h);
 
