@@ -3,13 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Birth Pulse - Philips Fixed Width Master</title>
+    <title>Birth Pulse - Philips TV Final</title>
     <script src="https://d3js.org/d3.v7.min.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         body, html {
             margin: 0; padding: 0; width: 100vw; height: 100vh;
-            overflow: hidden; background-color: #010206;
+            overflow: hidden; background-color: #000205;
             font-family: 'Inter', sans-serif; color: white;
         }
 
@@ -18,44 +18,35 @@
         .philips-title { font-size: 3.5vh; font-weight: 900; color: #3b82f6; letter-spacing: 4px; text-transform: uppercase; }
         .main-heading { font-size: 4.5vh; color: #a855f7; font-weight: 800; margin-top: 0.5vh; }
 
-        /* UI COUNTER - MOVED DOWN */
-        .ui-counter-root {
-            position: absolute; left: 3%; top: 55%; /* Shifted down from 45% */
-            z-index: 500;
-            display: flex;
-            flex-direction: column;
-            transform: translateY(-50%);
+        /* FIXED WIDTH UI GROUP - This prevents elongation */
+        .ui-group {
+            position: absolute; left: 3%; top: 58%; 
+            z-index: 500; transform: translateY(-50%);
+            display: flex; flex-direction: column;
+            width: fit-content; /* Shrinks to content size */
+            max-width: 35vw;    /* Matches the visual span of the digits */
         }
 
-        .label { font-size: 2.8vh; color: #a855f7; text-transform: uppercase; font-weight: 800; }
+        .label { font-size: 2.8vh; color: #a855f7; text-transform: uppercase; font-weight: 800; margin-left: 2px; }
         
-        /* 1.4x LARGER DIGITS */
         .count { 
-            font-size: 28vh; /* Increased 1.4x from 20vh */
-            font-weight: 900; color: #fbbf24; 
-            line-height: 0.85; margin: 0.5vh 0; 
-            text-shadow: 0 0 45px rgba(251, 191, 36, 0.45); 
-            display: inline-block;
+            font-size: 28vh; font-weight: 900; color: #fbbf24; 
+            line-height: 0.8; margin: 0.2vh 0; 
+            text-shadow: 0 0 50px rgba(251, 191, 36, 0.4); 
+            font-variant-numeric: tabular-nums;
+            white-space: nowrap;
         }
         
-        /* FIXED WIDTH PROGRESS SECTION - MATCHES NUMBER WIDTH */
-        .progress-section { 
-            width: fit-content; 
-            min-width: 38vw; /* Forces bar to stay sized to the digits */
-            margin-top: 1vh; 
-        }
-
-        .bar-wrapper { width: 100%; height: 16px; background: rgba(255,255,255,0.05); border-radius: 10px; overflow: hidden; border: 1px solid rgba(168, 85, 247, 0.3); }
-        .bar-fill { height: 100%; width: 0%; background: #fbbf24; box-shadow: 0 0 15px #fbbf24; }
+        /* PROGRESS BAR - Matches width of .count precisely */
+        .progress-section { width: 100%; margin-top: 1.5vh; }
+        .bar-wrapper { width: 100%; height: 20px; background: rgba(255,255,255,0.05); border-radius: 12px; overflow: hidden; border: 1.5px solid rgba(168, 85, 247, 0.4); }
+        .bar-fill { height: 100%; width: 0%; background: #fbbf24; box-shadow: 0 0 20px #fbbf24; }
         
-        .time-meta { display: flex; justify-content: space-between; align-items: flex-start; margin-top: 8px; font-weight: 800; font-size: 2.5vh; color: #a855f7; }
-        #clock { color: #fbbf24; font-size: 4.5vh; font-weight: 800; margin-top: -0.5vh; }
+        .time-meta { display: flex; justify-content: space-between; align-items: flex-start; margin-top: 10px; font-weight: 800; font-size: 2.6vh; color: #a855f7; }
+        #clock { color: #fbbf24; font-size: 5vh; font-weight: 900; letter-spacing: 1px; width: 100%; text-align: center; margin-top: 1vh; }
 
         .canvas-container { position: absolute; left: 0; top: 0; width: 100vw; height: 100vh; z-index: 5; pointer-events: none; }
         #main-canvas { width: 100%; height: 100%; }
-
-        .star { position: absolute; background: white; border-radius: 50%; animation: twinkle var(--d) infinite ease-in-out; }
-        @keyframes twinkle { 0%, 100% { opacity: 0.2; } 50% { opacity: 0.9; } }
     </style>
 </head>
 <body>
@@ -65,133 +56,127 @@
         <div class="main-heading">Mother & Child Care Women's Health</div>
     </div>
 
-    <div class="ui-counter-root">
+    <div class="ui-group">
         <span class="label">Live Global Births Today</span>
         <div id="birthCount" class="count">000.000</div>
+        
         <div class="progress-section">
             <div class="bar-wrapper"><div id="bar" class="bar-fill"></div></div>
             <div class="time-meta">
                 <span>00:00</span>
-                <div id="clock">00:00:00</div>
                 <span>24:00</span>
             </div>
+            <div id="clock">00:00:00</div>
         </div>
     </div>
 
-    <div id="starfield" class="absolute inset-0 z-0"></div>
     <div class="canvas-container"><canvas id="main-canvas"></canvas></div>
 
     <script>
         const BIRTH_RATE = 4.34;
         let worldGeo = null, flashingCountries = [], comets = [];
         const canvas = document.getElementById("main-canvas"), ctx = canvas.getContext("2d");
-        let w, h, rotX = 0, lastT = 0;
+        let rotX = 0, lastTime = performance.now(); 
 
         function resize() {
-            w = window.innerWidth; h = window.innerHeight;
-            canvas.width = w * window.devicePixelRatio;
-            canvas.height = h * window.devicePixelRatio;
+            canvas.width = window.innerWidth * window.devicePixelRatio;
+            canvas.height = window.innerHeight * window.devicePixelRatio;
             ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
         }
         window.onresize = resize;
         resize();
 
-        // High contrast globe visibility
-        const projection = d3.geoOrthographic().scale(h * 0.42).translate([w * 0.75, h * 0.52]).clipAngle(90);
+        const projection = d3.geoOrthographic()
+            .scale(window.innerHeight * 0.44)
+            .translate([window.innerWidth * 0.76, window.innerHeight * 0.52])
+            .clipAngle(90);
         const path = d3.geoPath(projection, ctx);
 
         async function init() {
-            const data = await d3.json("https://raw.githubusercontent.com/nvkelso/natural-earth-vector/master/geojson/ne_110m_admin_0_countries.geojson");
-            worldGeo = data;
-            createStars();
-            requestAnimationFrame(render);
-            startSim();
+            worldGeo = await d3.json("https://raw.githubusercontent.com/nvkelso/natural-earth-vector/master/geojson/ne_110m_admin_0_countries.geojson");
+            requestAnimationFrame(renderLoop);
+            startDataSim();
         }
 
-        function render(now) {
-            const dt = now - lastT;
-            lastT = now;
-            rotX += 0.006 * dt; 
-            projection.rotate([rotX, -15]);
+        function renderLoop(currentTime) {
+            const deltaTime = currentTime - lastTime;
+            lastTime = currentTime;
+
+            rotX += 0.007 * deltaTime; 
+            projection.rotate([rotX, -12]);
+
+            const w = window.innerWidth, h = window.innerHeight;
             ctx.clearRect(0, 0, w, h);
             const r = projection.scale();
-            const cx = w * 0.75, cy = h * 0.52;
+            const cx = w * 0.76, cy = h * 0.52;
 
-            drawComets(dt);
+            // Background Objects
+            const sunAngle = currentTime * 0.0001;
+            drawPlanet(cx, cy, r * 2.8, sunAngle, 30, "#fbbf24", 1.2); 
 
-            // Geocentric orbits
-            const sunAngle = now * 0.0002;
-            drawOrbitingBody(cx, cy, r * 2.8, sunAngle, 45, "#fbbf24", 1.0); 
-            drawOrbitingBody(cx, cy, r * 2.2, sunAngle * 1.5, 15, "#ff4500", 0.4); 
+            // Smooth Comets
+            updateComets(ctx, deltaTime, w, h);
 
-            // Ocean
-            const oceanG = ctx.createRadialGradient(cx-r/3, cy-r/3, r/5, cx, cy, r);
-            oceanG.addColorStop(0, "#1e40af"); oceanG.addColorStop(1, "#020617");
-            ctx.fillStyle = oceanG; ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI*2); ctx.fill();
+            // Globe
+            const ocean = ctx.createRadialGradient(cx-r/3, cy-r/3, r/5, cx, cy, r);
+            ocean.addColorStop(0, "#1e40af"); ocean.addColorStop(1, "#020617");
+            ctx.fillStyle = ocean; ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI*2); ctx.fill();
 
-            // Clearer Countries
             if (worldGeo) {
                 ctx.beginPath(); path(worldGeo);
-                ctx.fillStyle = "#f8fafc"; 
-                ctx.fill();
-                ctx.strokeStyle = "rgba(0,0,0,0.5)"; ctx.lineWidth = 0.5; ctx.stroke();
+                ctx.fillStyle = "#ffffff"; ctx.fill();
+                ctx.strokeStyle = "rgba(0,0,0,0.3)"; ctx.lineWidth = 0.5; ctx.stroke();
 
-                const cTime = Date.now();
-                flashingCountries.forEach((f, i) => {
-                    const age = cTime - f.t;
+                const nowMs = Date.now();
+                for (let i = flashingCountries.length - 1; i >= 0; i--) {
+                    const f = flashingCountries[i];
+                    const age = nowMs - f.t;
                     if (age < 2000) {
                         ctx.save();
-                        ctx.globalAlpha = 1 - (age/2000);
+                        ctx.globalAlpha = Math.max(0, 1 - (age/2000));
                         ctx.fillStyle = "#ff00ff";
-                        ctx.shadowBlur = 40; ctx.shadowColor = "#ff00ff";
+                        ctx.shadowBlur = 30; ctx.shadowColor = "#ff00ff";
                         ctx.beginPath(); path(f.feature); ctx.fill();
                         ctx.restore();
-                    } else flashingCountries.splice(i, 1);
-                });
+                    } else { flashingCountries.splice(i, 1); }
+                }
             }
 
-            // Globe Lighting
-            const shadowG = ctx.createRadialGradient(cx + Math.cos(sunAngle+Math.PI)*r*0.5, cy + Math.sin(sunAngle+Math.PI)*r*0.5, 0, cx, cy, r);
-            shadowG.addColorStop(0, "transparent"); shadowG.addColorStop(1, "rgba(0,0,0,0.8)");
-            ctx.fillStyle = shadowG; ctx.beginPath(); ctx.arc(cx, cy, r, 0, 7); ctx.fill();
+            // Shadow
+            const shadow = ctx.createRadialGradient(cx + Math.cos(sunAngle+Math.PI)*r*0.5, cy+Math.sin(sunAngle+Math.PI)*r*0.5, 0, cx, cy, r);
+            shadow.addColorStop(0, "transparent"); shadow.addColorStop(1, "rgba(0,0,0,0.85)");
+            ctx.fillStyle = shadow; ctx.beginPath(); ctx.arc(cx, cy, r, 0, 7); ctx.fill();
 
-            requestAnimationFrame(render);
+            requestAnimationFrame(renderLoop);
         }
 
-        function drawOrbitingBody(cx, cy, dist, angle, tilt, color, sizeMult) {
+        function drawPlanet(cx, cy, dist, angle, tilt, color, scale) {
             const x = cx + Math.cos(angle) * dist;
-            const y = cy + Math.sin(angle) * (dist * 0.3) + (tilt);
-            const grad = ctx.createRadialGradient(x, y, 0, x, y, 40 * sizeMult);
-            grad.addColorStop(0, "white"); grad.addColorStop(0.2, color); grad.addColorStop(1, "transparent");
-            ctx.fillStyle = grad; ctx.beginPath(); ctx.arc(x, y, 60 * sizeMult, 0, 7); ctx.fill();
+            const y = cy + Math.sin(angle) * (dist * 0.25) + tilt;
+            const g = ctx.createRadialGradient(x, y, 0, x, y, 50 * scale);
+            g.addColorStop(0, "white"); g.addColorStop(0.2, color); g.addColorStop(1, "transparent");
+            ctx.fillStyle = g; ctx.beginPath(); ctx.arc(x, y, 80 * scale, 0, 7); ctx.fill();
         }
 
-        function drawComets(dt) {
-            if (Math.random() < 0.012) {
-                comets.push({
-                    x: w + 100, y: Math.random() * h,
-                    vx: -(0.5 + Math.random() * 0.7), vy: (Math.random() - 0.5) * 0.3,
-                    life: 1.0, size: 3 + Math.random() * 2
-                });
+        function updateComets(ctx, dt, w, h) {
+            if (Math.random() < 0.01) {
+                comets.push({ x: w + 100, y: Math.random() * h, vx: -(0.4 + Math.random() * 0.5), vy: (Math.random() - 0.5) * 0.1, life: 1.0, size: 2 });
             }
-            comets.forEach((c, i) => {
-                c.x += c.vx * dt; c.y += c.vy * dt; c.life -= 0.0004 * dt;
-                const tailGrad = ctx.createLinearGradient(c.x, c.y, c.x + 200, c.y);
-                tailGrad.addColorStop(0, `rgba(255,255,255,${c.life})`);
-                tailGrad.addColorStop(1, "transparent");
-                ctx.strokeStyle = tailGrad; ctx.lineWidth = c.size; ctx.beginPath(); ctx.moveTo(c.x, c.y); ctx.lineTo(c.x + 200, c.y); ctx.stroke();
-                ctx.fillStyle = `rgba(255,255,255,${c.life})`;
-                ctx.beginPath(); ctx.arc(c.x, c.y, c.size, 0, 7); ctx.fill();
+            for (let i = comets.length - 1; i >= 0; i--) {
+                const c = comets[i];
+                c.x += c.vx * dt; c.y += c.vy * dt; c.life -= 0.0003 * dt;
+                const grad = ctx.createLinearGradient(c.x, c.y, c.x + 200, c.y);
+                grad.addColorStop(0, `rgba(255,255,255,${c.life})`); grad.addColorStop(1, "transparent");
+                ctx.strokeStyle = grad; ctx.lineWidth = c.size; ctx.beginPath(); ctx.moveTo(c.x, c.y); ctx.lineTo(c.x+200, c.y); ctx.stroke();
                 if (c.x < -300 || c.life <= 0) comets.splice(i, 1);
-            });
+            }
         }
 
-        function startSim() {
+        function startDataSim() {
             setInterval(() => {
                 const now = new Date();
                 const start = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
                 const elapsed = (Date.now() - start) / 1000;
-                // Formatted with Dots as in your image
                 document.getElementById('birthCount').innerText = Math.floor(elapsed * BIRTH_RATE).toLocaleString('de-DE');
                 document.getElementById('clock').innerText = now.toLocaleTimeString('en-GB');
                 document.getElementById('bar').style.width = (elapsed / 86400 * 100) + "%";
@@ -199,19 +184,7 @@
                     const feat = worldGeo.features[Math.floor(Math.random() * worldGeo.features.length)];
                     flashingCountries.push({feature: feat, t: Date.now()});
                 }
-            }, 1000 / (BIRTH_RATE / 1.5));
-        }
-
-        function createStars() {
-            const field = document.getElementById('starfield');
-            for(let i=0; i<200; i++) {
-                const s = document.createElement('div'); s.className = 'star';
-                const size = Math.random()*3;
-                s.style.width = s.style.height = size+'px';
-                s.style.left = Math.random()*100+'%'; s.style.top = Math.random()*100+'%';
-                s.style.setProperty('--d', (2+Math.random()*4)+'s');
-                field.appendChild(s);
-            }
+            }, 800);
         }
 
         init();
